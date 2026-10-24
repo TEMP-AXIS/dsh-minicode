@@ -24,6 +24,10 @@ const cases = [
   ['ugc_doc', { page: 'quickin/iteminst', section: '道具' }],
   ['ugc_pack', { task: '玩家进入区域时给队伍加buff并弹出提示' }],
   ['ugc_pack', { task: 'spawn a monster and play animation', budget: 800 }],
+  ['ugc_template', { action: 'list' }],
+  ['ugc_template', { action: 'get', id: 'slider' }],
+  ['ugc_memory', { action: 'list' }],
+  ['ugc_memory', { action: 'delete', id: 'builtin:clone-element' }],
 ];
 
 const missing = ['ugc_search', 'ugc_api', 'ugc_module', 'ugc_event', 'ugc_enum', 'ugc_doc', 'ugc_pack', 'ugc_status', 'ugc_guide'].filter((n) => !defs.has(n));

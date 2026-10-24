@@ -219,11 +219,11 @@ window.__ModuleLoader__.load({
             : h('div', { className: 'ugcList' }, data.items.map((item) =>
                 h('div', { className: 'ugcItem', key: item.id },
                   h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
-                    h('span', null, (item.pinned ? '📌 ' : '') + (item.topic || '(无主题)')),
+                    h('span', null, (item.pinned ? '📌 ' : '') + (item.builtin ? '📘 ' : '') + (item.topic || '(无主题)')),
                     h('span', { className: 'ugcRow' },
-                      h('span', { className: 'ugcTag' }, item.hits ? '命中 ' + item.hits : '未命中'),
-                      h(Btn, { onClick: () => act({ action: item.pinned ? 'unpin' : 'pin', id: item.id }) }, item.pinned ? '取消置顶' : '置顶'),
-                      h(Btn, { onClick: () => act({ action: 'delete', id: item.id }) }, '删除')
+                      h('span', { className: 'ugcTag' }, item.builtin ? '内置' : (item.hits ? '命中 ' + item.hits : '未命中')),
+                      item.builtin ? null : h(Btn, { onClick: () => act({ action: item.pinned ? 'unpin' : 'pin', id: item.id }) }, item.pinned ? '取消置顶' : '置顶'),
+                      item.builtin ? null : h(Btn, { onClick: () => act({ action: 'delete', id: item.id }) }, '删除')
                     )
                   ),
                   item.wrong ? h('div', { className: 'ugcMuted' }, '错误: ' + item.wrong) : null,
@@ -291,7 +291,7 @@ window.__ModuleLoader__.load({
         h('div', { className: 'ugcCard' },
           h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
             h('strong', null, '模板库（' + items.length + ' 个）'),
-            h(Btn, { onClick: () => { setDraft({ id: '', name: '', desc: '', tags: '', code: 'local Script = {}\n\nfunction Script:GameStart()\nend\n\nTriggerEvent.GameStart()\nreturn Script', builtin: false }); setNote(''); } }, '新建模板')
+            h(Btn, { onClick: () => { setDraft({ id: '', name: '', desc: '', tags: '', code: '-- 行为脚本骨架\nlocal Script = {}\n\nfunction Script:OnGameStart(event)\nend\n\nfunction Script:OnStart()\n  self:AddTriggerEvent(TriggerEvent.GameStart, self.OnGameStart)\nend\n\nreturn Script', builtin: false }); setNote(''); } }, '新建模板')
           ),
           h('div', { className: 'ugcList' }, items.map((item) =>
             h('div', { className: 'ugcItem', key: item.id },

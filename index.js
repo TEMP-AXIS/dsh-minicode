@@ -401,7 +401,7 @@ export function apply(ctx) {
         F.GUIDE,
         '',
         '该地图的补充规则：',
-        '- 动手前先 ugc_pack(任务) 抓一份上下文；写完整脚本从 ugc_template 取骨架（skeleton / player-join / timer-loop / area-check / team-buff / ui-text）。',
+        '- 动手前先 ugc_pack(任务) 抓一份上下文；写完整脚本从 ugc_template 取骨架（' + T.listTemplates().filter((t) => t.builtin).map((t) => t.id).join(' / ') + '）。',
         '- 任何 id（道具/方块/特效/音效/生物/粒子/变量/元件/自定义）都用 ugc_ids(action=lookup) 查真实值。',
         '- 查不到时绝不要编造数字，也不要猜：告诉玩家去 设置 → UGC 百科 → ID 登记 填写，登记请求会自动出现。',
         '- 玩家给了值以后用 ugc_ids(action=set) 存下来，之后同一 id 就能直接命中。',
@@ -448,6 +448,9 @@ export function apply(ctx) {
         const item = M.addMemory({ topic: args.topic, wrong: args.wrong, right: args.right, tags: args.tags });
         return { text: '记住 #' + item.id + ' ' + item.topic + ' -> ' + F.trunc(item.right, 120) };
       }
+      if (String(args.id || '').startsWith('builtin:')) {
+        return { text: '内置记忆只读（随插件发布，改不了也删不掉）：' + String(args.id) };
+      }
       if (action === 'delete') {
         const removed = M.removeMemory(args.id);
         return { text: removed ? '已删除 #' + args.id : '没有 #' + String(args.id) };
@@ -465,9 +468,9 @@ export function apply(ctx) {
       if (!list.items.length && !list.misses.length) return { text: '记忆为空。用 ugc_memory action=add 记一条。' };
       const lines = [];
       if (list.items.length) {
-        lines.push(list.items.length + ' 条记忆：');
+        lines.push(list.items.length + ' 条记忆（[内置] 随插件发布，只读）：');
         for (const item of list.items) {
-          const flags = (item.pinned ? ' [置顶]' : '') + (item.hits ? ' 命中' + item.hits + '次' : '');
+          const flags = (item.builtin ? ' [内置]' : '') + (item.pinned ? ' [置顶]' : '') + (item.hits ? ' 命中' + item.hits + '次' : '');
           lines.push('- #' + item.id + ' ' + item.topic + flags + '\n  错误: ' + F.trunc(item.wrong || '(未填)', 90) + '\n  正确: ' + F.trunc(item.right, 140));
         }
       }
@@ -482,7 +485,7 @@ export function apply(ctx) {
 
   ctx.tools.register({
     name: 'ugc_template',
-    description: 'Script skeletons and saved templates. action=list shows the built-in skeletons (behaviour script, player join, timer loop, area check, team buff, ui text) plus the templates the user saved; action=get returns the full Lua source; action=save stores the current script as a template for later runs.',
+    description: 'Script skeletons and saved templates. action=list shows the built-ins (behaviour skeleton, UI component, cloned-element list, slider, hold-to-repeat, cross-component call, player config) plus the templates the user saved; action=get returns the full Lua source; action=save stores the current script as a template for later runs.',
     parameters: {
       action: { type: 'string', required: true, enum: ['list', 'get', 'save', 'delete'], description: 'What to do.' },
       id: { type: 'string', description: 'get/delete: template id.' },

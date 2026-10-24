@@ -13,7 +13,8 @@
 索引状态与手动抓取、易错点记忆、代码模板库、ID 登记表、自动维护开关。
 
 记忆和模板都是**由 AI 自己维护**的：`ugc_guide` 里带着「收尾时自己记一条 / 自己存模板」的规则，
-设置页的自动维护标签只负责开或关。ID 表另有一个官方来源（见「ID」一节）。
+设置页的自动维护标签只负责开或关；另外随插件附了 12 条只读记忆和 7 个只读模板（照一套真实工程总结，见「内置记忆与模板」）。
+ID 表另有一个官方来源（见「ID」一节）。
 
 ## 开源地址
 
@@ -98,8 +99,9 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 2. **记忆** — 记录「常出错的地方」：主题 / 常见错误 / 正确写法 / 标签。
    命中相关查询时，`ugc_search` / `ugc_api` / `ugc_pack` 会在结果末尾自动附上这些纠错；
    置顶的条目还会进 `ugc_guide`。下方列出「查不到的问题」（零命中的搜索自动记录），可一键转成记忆。
-3. **模板** — 6 个内置模板（行为脚本骨架、玩家进入地图、定时循环、区域判定、按队伍加减益、自定义 UI 文本）
-   只读，可`另存为副本`；自定义模板可编辑、可删。
+   12 条**内置记忆**只读（见「内置记忆与模板」一节），自己记的条目可编辑、可删。
+3. **模板** — 7 个内置模板（行为脚本骨架、界面组件骨架、克隆元件列表、滑动条、长按连续触发、
+   跨组件调用、玩家配置读写）只读，可`另存为副本`；自定义模板可编辑、可删。
 4. **ID 登记** — 见下节；顶部有`同步官方 ID 表`按钮（8 张表，同步中会显示进度）。
 5. **自动维护** — 四个开关，默认全开：`自动记忆`（AI 收尾时自己记纠错）、
    `自动模板`（AI 自己把验证过的脚本存成模板）、`爬取后同步官方 ID 表`、`自动检查更新`。
@@ -110,12 +112,46 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 
 | 文件 | 内容 |
 | --- | --- |
-| `memory.json` | 易错点记忆 + 查不到的问题（上限 400 / 80） |
-| `templates.json` | 自定义模板 |
+| `memory.json` | 易错点记忆（自己记的）+ 查不到的问题（上限 400 / 80；内置 12 条不写盘） |
+| `templates.json` | 自定义模板（内置 7 个不写盘） |
 | `ids.json` | 已登记 id（来源 `player` / `official` / `harvest`）+ 待填写请求 |
 | `config.json` | 四个开关（`autoMemory` / `autoTemplates` / `autoIds` / `autoUpdate`） |
 | `update.json` | 最近一次 GitHub 更新检查的缓存（版本、star、issue、最新提交，6 小时有效） |
 | `index.json` | 设置页抓取产生的索引；存在时优先于插件内置的 `data/ugc-wiki.json` |
+
+## 内置记忆与模板
+
+这两张表是照着一套真实的迷你世界 UGC 工程（10 个组件、约 200 KB Lua）总结出来的，随插件发布、只读，
+在 `ugc_memory` / `ugc_template` 里标 `[内置]`；不想要就改 `lib/memory.mjs` 的 `SEED` 或 `lib/templates.mjs` 的 `META`。
+
+**12 条记忆**（前三条置顶，直接进 `ugc_guide`）：
+
+| 记忆 | 坑 |
+| --- | --- |
+| 克隆元件 | 不 `HideElement` 就 `CloneElement`，再拿模板 ID 去 `SetText`；克隆不带文本/颜色 |
+| 克隆清理 | 关界面只清 state，克隆元件留在界面上；每次 UIShow 重新克隆，元件越堆越多 |
+| 克隆点击 | 用模板 ID 判断点了哪一行（应该走 `event.uielement` → cloneMap） |
+| 克隆性能 | 一次克隆几十行卡住主线程（应该每 6 行 `threadpool:wait(0.01)`） |
+| 滑动条取值 | 用点击事件读位置，或没注册 `UIScrollPaneTouchBegin` / `TouchEnd` |
+| 滑动条轮询 | 只在 TouchEnd 读一次，拖动过程中数值不动 |
+| 滑动条回写 | 数值一变就 `TurnSliderToPos`，手指被拽回去、数值来回跳 |
+| 滑动条方向 | 滚动面板的 x 是反的（`ratio = (W - x) / W`） |
+| 引擎接口 | `AddTriggerEvent` / `DoPeriodicTask` / `GetElementAttrValue` 在 wiki 里查不到，但组件脚本里就有 |
+| 变量 id | 界面型变量 id 只能玩家给，不许编 |
+| 玩家状态 | 用全局变量存每玩家状态，UI 隐藏时不清理 |
+| 代码风格 | 满屏防御性判断、一次性常量写成顶层 local、函数切得过碎 |
+
+**7 个模板**（`ugc_template list` 看全部，`get` 取源码）：
+
+| id | 内容 |
+| --- | --- |
+| `skeleton` | `local Script = {}` + `OnStart` 里 `AddTriggerEvent` + `return Script` |
+| `ui-base` | UI_ID 常量、每玩家状态、UIShow / UIHide 生命周期、按钮注册 |
+| `ui-clone` | 克隆行列表：模板行隐藏 → CloneElement → `#cloneN` 子元件 ID → DeleteElement 清理 |
+| `slider` | 滑动条：TouchBegin/End + 0.03 秒轮询 + 反向换算 + `TurnSliderToPos` 回写 |
+| `hold-repeat` | 长按连续触发：按下开 `DoPeriodicTask`，松手 `:Cancel()`，到边界自动停 |
+| `cross-component` | `FindObject(...):GetComponent(...)` 调别人、`comp:CloseUI` 关别人界面 |
+| `player-config` | `Data:GetValue` / `SetValue` + json 存玩家配置，进图补默认字段 |
 
 ## ID：官方表 + 玩家补
 
@@ -178,8 +214,8 @@ index.js             cordis 插件：注册 12 个工具 + /ugc-wiki/api（无�
 client.js            浏览器端：设置页五个标签（window.__ModuleLoader__）
 lib/store.mjs        索引加载、IDF 加权检索、模块/页面解析
 lib/format.mjs       文本渲染（签名行 / 完整卡片 / 压缩卡片 / 模块表）
-lib/memory.mjs       易错点记忆 + 查不到的问题
-lib/templates.mjs    模板库（6 个内置 + 自定义）
+lib/memory.mjs       易错点记忆 + 查不到的问题（含 12 条只读内置记忆）
+lib/templates.mjs    模板库（7 个只读内置模板 + 自定义）
 lib/ids.mjs          ID 登记表 + 待填写请求 + 官方表批量导入
 lib/idsource.mjs     旧官网 8 张 id 表的下载与解析（developers.mini1.cn）
 lib/config.mjs       自动维护开关（config.json）
