@@ -71,6 +71,8 @@ window.__ModuleLoader__.load({
       const status = state.data;
       const crawl = status ? status.crawl : null;
       const running = crawl && crawl.state === 'running';
+      const [updState, setUpdState] = useState(null);
+      const [updBusy, setUpdBusy] = useState(false);
 
       React.useEffect(() => {
         if (!running) return undefined;
@@ -87,6 +89,15 @@ window.__ModuleLoader__.load({
           .then(() => setBusy(''));
       }
 
+      function checkUpdate() {
+        setUpdBusy(true);
+        setError('');
+        request('/update', { method: 'POST', body: JSON.stringify({ force: true }) })
+          .then((data) => setUpdState(data.update))
+          .catch((err) => setError(String(err.message || err)))
+          .then(() => setUpdBusy(false));
+      }
+
       function harvest() {
         setBusy('harvest');
         setError('');
@@ -101,6 +112,13 @@ window.__ModuleLoader__.load({
 
       const counts = status.index.counts || {};
       const percent = crawl && crawl.total ? Math.round((crawl.done / crawl.total) * 100) : 0;
+      const upd = updState || status.update || {};
+      const updLine = upd.error
+        ? '更新检查失败：' + upd.error
+        : upd.latest
+          ? (upd.newer ? '有新版本 v' + upd.latest + '（当前 v' + (upd.local || '?') + '），从 GitHub 重新安装即可升级。' : '已是最新版本 v' + (upd.local || upd.latest) + '。')
+          : '还没有检查过更新。';
+      const linkStyle = { textDecoration: 'none', display: 'inline-block' };
 
       return h('div', { className: 'ugcCard' },
         h('div', { className: 'ugcGrid' },
@@ -141,6 +159,23 @@ window.__ModuleLoader__.load({
             )
           : null,
         h('div', { className: 'ugcMuted' }, '抓取只在点击按钮时执行；结果写入数据目录的 index.json，并立刻替换当前索引。'),
+        h('div', { style: { borderTop: '1px solid var(--dsw-alias-border-l1)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 } },
+          h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
+            h('strong', null, 'dsh-ugc-wiki v' + (upd.local || '0.0.0') + (upd.latest && upd.newer ? ' → v' + upd.latest : '')),
+            h(Btn, { disabled: updBusy, onClick: checkUpdate }, updBusy ? '检查中…' : '检查更新')
+          ),
+          h('div', { className: upd.error ? 'ugcErr' : 'ugcMuted' }, updLine),
+          h('div', { className: 'ugcRow' },
+            h('a', { className: 'ugcBtn', style: linkStyle, href: upd.repoUrl || 'https://github.com/TEMP-AXIS/dsh-minicode', target: '_blank', rel: 'noreferrer' }, 'GitHub 仓库'),
+            h('a', { className: 'ugcBtn', style: linkStyle, href: upd.starUrl || 'https://github.com/TEMP-AXIS/dsh-minicode/stargazers', target: '_blank', rel: 'noreferrer' }, '⭐ Star'),
+            h('a', { className: 'ugcBtn', style: linkStyle, href: upd.issueUrl || 'https://github.com/TEMP-AXIS/dsh-minicode/issues', target: '_blank', rel: 'noreferrer' }, '问题反馈 / Issue')
+          ),
+          h('div', { className: 'ugcMuted' },
+            '★ ' + (upd.stars || 0) + ' · issues ' + (upd.issues || 0) +
+            (upd.checkedAt ? ' · 检查于 ' + String(upd.checkedAt).replace('T', ' ').slice(0, 19) : '') +
+            (upd.sha ? ' · 最新提交 ' + upd.sha : '')
+          )
+        ),
         h(Notice, { text: note }),
         h(Notice, { text: error, error: true })
       );
@@ -425,7 +460,7 @@ window.__ModuleLoader__.load({
     function AutoTab() {
       const [state, reload] = useLoad(() => request('/settings'));
       const [error, setError] = useState('');
-      const cfg = (state.data && state.data.config) || { autoMemory: true, autoTemplates: true, autoIds: true };
+      const cfg = (state.data && state.data.config) || { autoMemory: true, autoTemplates: true, autoIds: true, autoUpdate: true };
       function toggle(key) {
         const payload = {};
         payload[key] = !cfg[key];
@@ -437,9 +472,10 @@ window.__ModuleLoader__.load({
         ['autoMemory', '自动记忆', 'AI 收尾时把「以为是这样、实际是那样」的修正自己记下来，之后 ugc_search / ugc_pack 会自动附上。'],
         ['autoTemplates', '自动模板', 'AI 写出并验证过的脚本自己存成模板，下次同类任务先取现成骨架。'],
         ['autoIds', '爬取后同步官方 ID 表', '每次手动爬取成功后，顺带刷新 developers.mini1.cn 的 8 张 id 表。'],
+        ['autoUpdate', '自动检查更新', '启动时读一次 GitHub 仓库（缓存 6 小时），有更新就在 ugc_status 和设置页提示。'],
       ];
       return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12 } },
-        h('div', { className: 'ugcMuted' }, '这三项都由 AI 自己维护，不需要你逐条操作；关掉以后 AI 不再主动写入，工具本身照常可用。'),
+        h('div', { className: 'ugcMuted' }, '前三项由 AI 自己维护，不需要你逐条操作；关掉以后 AI 不再主动写入，工具本身照常可用。最后一项只影响插件自己发起的 GitHub 查询。'),
         h('div', { className: 'ugcCard' }, rows.map((row) =>
           h('div', { key: row[0], className: 'ugcRow', style: { justifyContent: 'space-between', alignItems: 'flex-start' } },
             h('div', { style: { flex: '1 1 320px' } },

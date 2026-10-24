@@ -1,5 +1,10 @@
 # dsh-ugc-wiki
 
+[![GitHub stars](https://img.shields.io/github/stars/TEMP-AXIS/dsh-minicode?style=flat-square&label=stars)](https://github.com/TEMP-AXIS/dsh-minicode/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/TEMP-AXIS/dsh-minicode?style=flat-square&label=issues)](https://github.com/TEMP-AXIS/dsh-minicode/issues)
+[![version](https://img.shields.io/github/package-json/v/TEMP-AXIS/dsh-minicode?style=flat-square&label=version)](https://github.com/TEMP-AXIS/dsh-minicode/blob/main/package.json)
+[![license](https://img.shields.io/github/license/TEMP-AXIS/dsh-minicode?style=flat-square)](https://github.com/TEMP-AXIS/dsh-minicode/blob/main/LICENSE)
+
 迷你世界 UGC 开发文档（<https://dev-wiki.mini1.cn/ugc-wiki/>）的**离线索引 + 查询工具**，
 给 DeepSeek Harness 的 agent 用：爬虫按需跑（在设置页点按钮），回答期只读一个 692 KiB 的 JSON，
 单次查询通常只花几百 token，不需要联网、不需要 SQLite、没有原生依赖。
@@ -10,13 +15,56 @@
 记忆和模板都是**由 AI 自己维护**的：`ugc_guide` 里带着「收尾时自己记一条 / 自己存模板」的规则，
 设置页的自动维护标签只负责开或关。ID 表另有一个官方来源（见「ID」一节）。
 
-## 安装（本机 desktop profile）
+## 开源地址
+
+- 仓库：<https://github.com/TEMP-AXIS/dsh-minicode>
+- 点个 **Star**：<https://github.com/TEMP-AXIS/dsh-minicode/stargazers>
+- 提 **Issue** / 反馈 bug：<https://github.com/TEMP-AXIS/dsh-minicode/issues>
+- 克隆：`git clone https://github.com/TEMP-AXIS/dsh-minicode.git`
+
+插件会自己查有没有新版本：DSH 启动时读一次 GitHub 仓库（结果缓存 6 小时），发现新版就在
+`ugc_status` 末尾写一行 `update: <仓库地址>`，设置页「索引」标签底部也会显示当前版本 / 最新版本 /
+star / issue 数和三个链接。想手动查就点那里的`检查更新`按钮；不想让它联网就去「自动维护」把
+`自动检查更新`关掉（默认开）。
+
+## 安装
+
+### 从 GitHub 源码安装（推荐）
 
 ```bash
-dsh plugin --profile desktop add link:C:/Users/mi/Desktop/dsh-minicode
+dsh plugin --profile desktop add github:TEMP-AXIS/dsh-minicode
 ```
 
-`package.json` 的 `dsh.profile.bundles` 里要有 `dsh-ugc-wiki`（上面这条命令会自动加），
+这条走 pnpm 的 git 依赖解析，需要：
+
+1. 本机装了 **Git**，并且 `git` 在 PATH 上 —— pnpm 用 `git ls-remote` 解析 `github:` 依赖；
+   从 Electron 里起 DSH 时 PATH 可能和终端不一样，装之前先 `git --version` 确认一下。
+2. pnpm 默认禁止 git 依赖执行构建脚本；如果装的时候提示，把它打印的那个精确包名
+   （形如 `dsh-ugc-wiki@git+https://github.com/TEMP-AXIS/dsh-minicode.git#<sha>`）加到
+   `~/.dsh/profiles/desktop/pnpm-workspace.yaml` 的 `allowBuilds` 下再装一次。
+   本插件没有构建步骤（`lib/` 和 `data/` 直接就是源码 + 索引），一般不会触发。
+
+### 没有 git？用源码压缩包
+
+```bash
+dsh plugin --profile desktop add https://github.com/TEMP-AXIS/dsh-minicode/archive/refs/heads/main.tar.gz
+```
+
+pnpm 能直接把 GitHub 的仓库压缩包当依赖装（本机实测了这个形式，无需 git、无构建脚本）。
+缺点是压缩包会把 `_probe/` 一起带上（约 1 MB）；想干净就先 `git clone` 再 `link:`。
+
+### 从本地副本安装（改代码时用这个）
+
+```bash
+git clone https://github.com/TEMP-AXIS/dsh-minicode.git
+dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
+```
+
+`link:` 是软链接，改完文件**重启 DSH** 就生效，不用重装。
+
+### 装完
+
+`package.json` 的 `dsh.profile.bundles` 里要有 `dsh-ugc-wiki`（上面两条命令都会自动加），
 **重启 DSH** 后 12 个 `ugc_*` 工具和设置页才会出现。
 
 ## 工具（12 个）
@@ -30,7 +78,7 @@ dsh plugin --profile desktop add link:C:/Users/mi/Desktop/dsh-minicode
 | `ugc_enum` | 96 组常量枚举（WorldType、AbsoluteCampType…） | ~150 token/组 |
 | `ugc_doc` | 教程/概念/组件函数/更新日志等 15 篇散文页，可按小节读 | 200–4000 字符 |
 | `ugc_pack` | 给一段任务描述自动拼一份 API 上下文包（带字符预算） | 预算内 |
-| `ugc_status` | 索引来源与构建时间、wiki 修订时间、条目数、记忆/模板/ID 统计 | ~700 字符 |
+| `ugc_status` | 索引来源与构建时间、wiki 修订时间、条目数、记忆/模板/ID 统计、版本与更新提示 | ~950 字符 |
 | `ugc_guide` | 迷你世界 Lua 脚本骨架、查阅顺序、置顶的易错点 | ~1.6 KB |
 | `ugc_memory` | 易错点记忆：`add` / `list` / `search` / `delete` / `pin` / `clear-misses` | 小 |
 | `ugc_template` | 代码模板库：`list` / `get` / `save` / `delete` | 模板大小 |
@@ -45,16 +93,18 @@ dsh plugin --profile desktop add link:C:/Users/mi/Desktop/dsh-minicode
 
 1. **索引** — 索引来源（插件内置 / 手动抓取）、文件路径、构建时间、wiki 更新、条目统计、数据目录；
    按钮：`立即抓取 wiki`（后台任务 + 进度条，可取消）、`从 wiki 提取内置 id`、`刷新`。
-   **抓取只在点按钮时发生**，插件启动、agent 调用都不会联网。
+   **抓取只在点按钮时发生**，插件启动、agent 调用都不会联网。卡片底部是版本区：当前版本、
+   `检查更新` 按钮（读 GitHub，显示 star / issue 数和最新提交）、以及仓库 / Star / Issue 三个链接。
 2. **记忆** — 记录「常出错的地方」：主题 / 常见错误 / 正确写法 / 标签。
    命中相关查询时，`ugc_search` / `ugc_api` / `ugc_pack` 会在结果末尾自动附上这些纠错；
    置顶的条目还会进 `ugc_guide`。下方列出「查不到的问题」（零命中的搜索自动记录），可一键转成记忆。
 3. **模板** — 6 个内置模板（行为脚本骨架、玩家进入地图、定时循环、区域判定、按队伍加减益、自定义 UI 文本）
    只读，可`另存为副本`；自定义模板可编辑、可删。
 4. **ID 登记** — 见下节；顶部有`同步官方 ID 表`按钮（8 张表，同步中会显示进度）。
-5. **自动维护** — 三个开关，默认全开：`自动记忆`（AI 收尾时自己记纠错）、
-   `自动模板`（AI 自己把验证过的脚本存成模板）、`爬取后同步官方 ID 表`。
-   关掉只是让 agent 不再主动写入，工具照常可用。开关存在 `config.json`。
+5. **自动维护** — 四个开关，默认全开：`自动记忆`（AI 收尾时自己记纠错）、
+   `自动模板`（AI 自己把验证过的脚本存成模板）、`爬取后同步官方 ID 表`、`自动检查更新`。
+   前三个关掉只是让 agent 不再主动写入，工具照常可用；最后一个只挡插件自己发起的 GitHub 查询。
+   开关存在 `config.json`。
 
 数据都在 `~/.dsh-ugc-wiki`（可用 `DSH_UGC_DATA_DIR` 改到别处，拒绝写到文件系统根目录）：
 
@@ -63,7 +113,8 @@ dsh plugin --profile desktop add link:C:/Users/mi/Desktop/dsh-minicode
 | `memory.json` | 易错点记忆 + 查不到的问题（上限 400 / 80） |
 | `templates.json` | 自定义模板 |
 | `ids.json` | 已登记 id（来源 `player` / `official` / `harvest`）+ 待填写请求 |
-| `config.json` | 三个自动维护开关（`autoMemory` / `autoTemplates` / `autoIds`） |
+| `config.json` | 四个开关（`autoMemory` / `autoTemplates` / `autoIds` / `autoUpdate`） |
+| `update.json` | 最近一次 GitHub 更新检查的缓存（版本、star、issue、最新提交，6 小时有效） |
 | `index.json` | 设置页抓取产生的索引；存在时优先于插件内置的 `data/ugc-wiki.json` |
 
 ## ID：官方表 + 玩家补
@@ -132,6 +183,7 @@ lib/templates.mjs    模板库（6 个内置 + 自定义）
 lib/ids.mjs          ID 登记表 + 待填写请求 + 官方表批量导入
 lib/idsource.mjs     旧官网 8 张 id 表的下载与解析（developers.mini1.cn）
 lib/config.mjs       自动维护开关（config.json）
+lib/update.mjs       GitHub 仓库查询：版本比较、star / issue、检查更新缓存
 lib/harvest.mjs      从语料里挖 id 数字（并统计各种 ID 的提及次数）
 lib/crawl.mjs        抓取 40 页并组装索引（在线 / 离线）
 lib/api.mjs          /ugc-wiki/api 路由与后台抓取任务
@@ -165,3 +217,5 @@ DSH_UGC_DEBUG=<某个可写路径>   # apply() 结束后追加一行 "ugc-wiki a
 - 解析器按 VitePress 的四种页面形状工作：API 函数页、枚举页、事件页、散文页；
   散文页里嵌的函数表会被抽取为额外的 API 记录（componentapi、globalfunc、obj…）。
 - `apis/API.html` 只是导航页，构建时跳过。
+- 更新检查只读公开的 GitHub API 与 `raw.githubusercontent.com`，不发任何本地信息；
+  仓库还没公开时（API 返回 404）会显示「仓库还没有公开」，不影响任何工具。

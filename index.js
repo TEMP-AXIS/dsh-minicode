@@ -16,6 +16,7 @@ import * as I from './lib/ids.mjs';
 import { crawledIndexFile, dataDir } from './lib/paths.mjs';
 import { getConfig } from './lib/config.mjs';
 import { seedFromBundle } from './lib/idsource.mjs';
+import { REPO_URL, STAR_URL, ISSUE_URL, refreshInBackground, updateInfo } from './lib/update.mjs';
 import { API_PREFIX, createApi } from './lib/api.mjs';
 
 export const name = 'ugc-wiki';
@@ -113,6 +114,16 @@ export function apply(ctx) {
     }
   } catch {
     /* an unwritable data dir just means ids stay empty until the player fills them */
+  }
+  // Automatic update check: one GitHub read at boot, and only when the cached
+  // answer is older than six hours.  It never runs on a tool call, and the
+  // Settings page can switch it off (autoUpdate).
+  if (getConfig().autoUpdate) {
+    const trace = (message) => {
+      if (!process.env.DSH_UGC_DEBUG) return;
+      try { appendFileSync(process.env.DSH_UGC_DEBUG, 'ugc-wiki ' + message + '\n'); } catch { /* best effort */ }
+    };
+    refreshInBackground(trace).catch(() => {});
   }
   ctx.tools.register({
     name: 'ugc_search',
@@ -361,6 +372,7 @@ export function apply(ctx) {
       const s = store();
       const c = s.meta.counts || {};
       const info = indexInfo();
+      const u = updateInfo();
       const lines = [
         'mini world ugc wiki index (' + info.source + ')',
         'source: ' + s.meta.source,
@@ -369,7 +381,10 @@ export function apply(ctx) {
         'functions: ' + s.apis.length + ' (' + (c.params || 0) + ' params)  events: ' + s.events.length + '  enum groups: ' + s.enums.length + ' (' + (c.enumValues || 0) + ' values)  docs: ' + s.docs.length,
         'modules: ' + listModules(s),
         'memory: ' + JSON.stringify(M.memoryStats()) + '  templates: ' + JSON.stringify(T.templateStats()) + '  ids: ' + JSON.stringify(I.idStats()),
+        'version: ' + u.local + (u.latest ? '  latest on github: ' + u.latest + (u.newer ? '  <-- newer available' : '  (up to date)') : ''),
       ];
+      if (u.newer) lines.push('update: ' + REPO_URL + '  (star ' + STAR_URL + ', issues ' + ISSUE_URL + ')');
+      if (u.error) lines.push('update check: ' + u.error);
       return { text: lines.join('\n') };
     },
     presentCall: present('UGC wiki status'),
