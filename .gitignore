@@ -5,5 +5,6 @@ node_modules/
 _probe/asar_out/
 _probe/tmp*/
 _probe/*.log
+_probe/*.log.*
 data/_fresh.json
 *.tmp

@@ -1,7 +1,7 @@
 {
-  "name": "dsh-ugc-wiki",
-  "version": "0.3.1",
-  "description": "迷你世界 UGC wiki 离线索引 (MiniWorld UGC wiki offline index) for DeepSeek Harness: crawls dev-wiki.mini1.cn/ugc-wiki once, then answers API/event/enum/doc lookups from a bundled JSON index in a few hundred tokens.",
+  "name": "dsh-minicode",
+  "version": "0.4.0",
+  "description": "MiniWorld (迷你世界) UGC wiki as a local index for DeepSeek Harness. Twelve agent tools answer API, event, enum, doc and id lookups from a bundled index in a few hundred tokens: one click crawls the wiki when you want it fresh, and nothing is fetched, parsed or opened at query time.",
   "type": "module",
   "engines": {
     "node": "^22.15.0 || >=24.0.0"
@@ -47,6 +47,7 @@
     "miniworld",
     "ugc",
     "wiki",
+    "minicode",
     "lua"
   ],
   "license": "MIT",

@@ -1,20 +1,20 @@
-// Settings page for dsh-ugc-wiki (browser half).
+// Settings page for dsh-minicode (browser half).
 //
 // Four tabs: the index (with a manual crawl button - crawling is never automatic),
 // the memory of mistakes, the template library, and the id registry the player
 // fills in when the wiki cannot supply a number.
 window.__ModuleLoader__.load({
-  id: 'dsh-ugc-wiki',
+  id: 'dsh-minicode',
   factory(require) {
     const React = require('react');
     const h = React.createElement;
     const useState = React.useState;
-    const NS = 'dsh-ugc-wiki';
-    const API = '/ugc-wiki/api';
+    const NS = 'dsh-minicode';
+    const API = '/dsh-minicode/api';
 
     const DICT = {
-      zh: { nav: 'UGC 百科', close: '关闭', index: '索引', memory: '记忆', templates: '模板', ids: 'ID 登记', auto: '自动维护' },
-      en: { nav: 'UGC Wiki', close: 'Close', index: 'Index', memory: 'Memory', templates: 'Templates', ids: 'IDs', auto: 'Automation' },
+      zh: { nav: 'MiniCode', close: '关闭', index: '索引', memory: '记忆', templates: '模板', ids: 'ID 登记', auto: '自动维护' },
+      en: { nav: 'MiniCode', close: 'Close', index: 'Index', memory: 'Memory', templates: 'Templates', ids: 'IDs', auto: 'Automation' },
     };
 
     const CSS = ".ugcWrap{display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--dsw-alias-label-primary)}\n.ugcHead{display:flex;align-items:center;justify-content:space-between;gap:12px}\n.ugcTabs{display:flex;gap:6px;border-bottom:1px solid var(--dsw-alias-border-l1);padding-bottom:8px;flex-wrap:wrap}\n.ugcTab{padding:6px 12px;border-radius:var(--dsw-radius-sm);cursor:pointer;background:transparent;border:1px solid transparent;color:var(--dsw-alias-label-tertiary);font:inherit}\n.ugcTab[data-on='1']{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-border-l1)}\n.ugcCard{border:1px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-md);padding:12px;background:var(--dsw-alias-bg-layer-2);display:flex;flex-direction:column;gap:10px}\n.ugcGrid{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;align-items:center}\n.ugcMuted{color:var(--dsw-alias-label-tertiary);font-size:12px}\n.ugcBtn{padding:5px 12px;border-radius:var(--dsw-radius-sm);border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-overlay);color:var(--dsw-alias-label-primary);cursor:pointer;font:inherit}\n.ugcBtn:hover{background:var(--dsw-alias-interactive-bg-hover)}\n.ugcBtn:disabled{opacity:.45;cursor:default}\n.ugcBtnPrimary{background:var(--dsw-alias-brand-primary);border-color:var(--dsw-alias-brand-primary);color:#fff}\n.ugcInput,.ugcArea,.ugcSelect{width:100%;box-sizing:border-box;padding:6px 8px;border-radius:var(--dsw-radius-sm);border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-overlay);color:var(--dsw-alias-label-primary);font:inherit}\n.ugcArea{min-height:240px;font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.5;resize:vertical}\n.ugcCode{max-height:420px;overflow:auto;margin:0;padding:10px;border-radius:var(--dsw-radius-sm);border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-overlay);font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.5;white-space:pre}\n.ugcList{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto}\n.ugcItem{border:1px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-sm);padding:8px 10px;display:flex;flex-direction:column;gap:4px}\n.ugcRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}\n.ugcProgress{height:6px;border-radius:3px;background:var(--dsw-alias-border-l1);overflow:hidden}\n.ugcBar{height:100%;background:var(--dsw-alias-brand-primary);transition:width .2s}\n.ugcErr{color:#d9534f}\n.ugcTag{display:inline-block;padding:1px 6px;border-radius:9px;border:1px solid var(--dsw-alias-border-l1);color:var(--dsw-alias-label-tertiary);font-size:11px}";
@@ -161,7 +161,7 @@ window.__ModuleLoader__.load({
         h('div', { className: 'ugcMuted' }, '抓取只在点击按钮时执行；结果写入数据目录的 index.json，并立刻替换当前索引。'),
         h('div', { style: { borderTop: '1px solid var(--dsw-alias-border-l1)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 } },
           h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
-            h('strong', null, 'dsh-ugc-wiki v' + (upd.local || '0.0.0') + (upd.latest && upd.newer ? ' → v' + upd.latest : '')),
+            h('strong', null, 'dsh-minicode v' + (upd.local || '0.0.0') + (upd.latest && upd.newer ? ' → v' + upd.latest : '')),
             h(Btn, { disabled: updBusy, onClick: checkUpdate }, updBusy ? '检查中…' : '检查更新')
           ),
           h('div', { className: upd.error ? 'ugcErr' : 'ugcMuted' }, updLine),
@@ -484,9 +484,9 @@ window.__ModuleLoader__.load({
 
     function injectStyle() {
       if (typeof document === 'undefined') return;
-      if (document.getElementById('dsh-ugc-wiki-style')) return;
+      if (document.getElementById('dsh-minicode-style')) return;
       const style = document.createElement('style');
-      style.id = 'dsh-ugc-wiki-style';
+      style.id = 'dsh-minicode-style';
       style.textContent = CSS;
       document.head.appendChild(style);
     }
@@ -507,7 +507,7 @@ window.__ModuleLoader__.load({
           ctx.slots.register(
             {
               name: 'settings.section',
-              id: 'ugc-wiki',
+              id: 'dsh-minicode',
               order: 610,
               label: () => t('nav'),
               locale: NS,

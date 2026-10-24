@@ -1,20 +1,23 @@
-# dsh-ugc-wiki
+# dsh-minicode
 
 [![GitHub stars](https://img.shields.io/github/stars/TEMP-AXIS/dsh-minicode?style=flat-square&label=stars)](https://github.com/TEMP-AXIS/dsh-minicode/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/TEMP-AXIS/dsh-minicode?style=flat-square&label=issues)](https://github.com/TEMP-AXIS/dsh-minicode/issues)
 [![version](https://img.shields.io/github/package-json/v/TEMP-AXIS/dsh-minicode?style=flat-square&label=version)](https://github.com/TEMP-AXIS/dsh-minicode/blob/main/package.json)
 [![license](https://img.shields.io/github/license/TEMP-AXIS/dsh-minicode?style=flat-square)](https://github.com/TEMP-AXIS/dsh-minicode/blob/main/LICENSE)
 
-迷你世界 UGC 开发文档（<https://dev-wiki.mini1.cn/ugc-wiki/>）的**离线索引 + 查询工具**，
+MiniWorld (迷你世界) UGC 开发文档（<https://dev-wiki.mini1.cn/ugc-wiki/>）的**离线索引 + 查询工具**，
 给 DeepSeek Harness 的 agent 用：爬虫按需跑（在设置页点按钮），回答期只读一个 692 KiB 的 JSON，
 单次查询通常只花几百 token，不需要联网、不需要 SQLite、没有原生依赖。
 
-除了 12 个给 agent 的 `ugc_*` 工具，插件还在 DSH 设置页里加了一页 **UGC 百科**：
+除了 12 个给 agent 的 `ugc_*` 工具，插件还在 DSH 设置页里加了一页 **MiniCode**：
 索引状态与手动抓取、易错点记忆、代码模板库、ID 登记表、自动维护开关。
 
 记忆和模板都是**由 AI 自己维护**的：`ugc_guide` 里带着「收尾时自己记一条 / 自己存模板」的规则，
 设置页的自动维护标签只负责开或关；另外随插件附了 12 条只读记忆和 7 个只读模板（照一套真实工程总结，见「内置记忆与模板」）。
 ID 表另有一个官方来源（见「ID」一节）。
+
+> 0.4.0 起插件名是 **dsh-minicode**（原来叫 dsh-ugc-wiki）：包名、设置页标题、数据目录都跟着改了，
+> 只有给 agent 的 12 个工具仍叫 `ugc_*` —— 那是它们真正在做的事（查 UGC 百科），改名会让提示词和已有菜谱全部失效。
 
 ## 开源地址
 
@@ -41,7 +44,7 @@ dsh plugin --profile desktop add github:TEMP-AXIS/dsh-minicode
 1. 本机装了 **Git**，并且 `git` 在 PATH 上 —— pnpm 用 `git ls-remote` 解析 `github:` 依赖；
    从 Electron 里起 DSH 时 PATH 可能和终端不一样，装之前先 `git --version` 确认一下。
 2. pnpm 默认禁止 git 依赖执行构建脚本；如果装的时候提示，把它打印的那个精确包名
-   （形如 `dsh-ugc-wiki@git+https://github.com/TEMP-AXIS/dsh-minicode.git#<sha>`）加到
+   （形如 `dsh-minicode@git+https://github.com/TEMP-AXIS/dsh-minicode.git#<sha>`）加到
    `~/.dsh/profiles/desktop/pnpm-workspace.yaml` 的 `allowBuilds` 下再装一次。
    本插件没有构建步骤（`lib/` 和 `data/` 直接就是源码 + 索引），一般不会触发。
 
@@ -65,7 +68,7 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 
 ### 装完
 
-`package.json` 的 `dsh.profile.bundles` 里要有 `dsh-ugc-wiki`（上面两条命令都会自动加），
+`package.json` 的 `dsh.profile.bundles` 里要有 `dsh-minicode`（上面两条命令都会自动加），
 **重启 DSH** 后 12 个 `ugc_*` 工具和设置页才会出现。
 
 ## 工具（12 个）
@@ -88,9 +91,9 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 推荐流程：`ugc_guide` 一次 → `ugc_search` 找名字 → `ugc_api` 看卡片 → 写代码；
 多 API 任务直接用 `ugc_pack`；写模板/骨架先 `ugc_template list`；凡是要填 id，先 `ugc_ids lookup`。
 
-## 设置页：设置 → UGC 百科
+## 设置页：设置 → MiniCode
 
-五个标签页，全部走宿主端 `/ugc-wiki/api`（同一个插件注册的 HTTP 前缀）：
+五个标签页，全部走宿主端 `/dsh-minicode/api`（同一个插件注册的 HTTP 前缀）：
 
 1. **索引** — 索引来源（插件内置 / 手动抓取）、文件路径、构建时间、wiki 更新、条目统计、数据目录；
    按钮：`立即抓取 wiki`（后台任务 + 进度条，可取消）、`从 wiki 提取内置 id`、`刷新`。
@@ -111,7 +114,8 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
    前三个关掉只是让 agent 不再主动写入，工具照常可用；最后一个只挡插件自己发起的 GitHub 查询。
    开关存在 `config.json`。
 
-数据都在 `~/.dsh-ugc-wiki`（可用 `DSH_UGC_DATA_DIR` 改到别处，拒绝写到文件系统根目录）：
+数据都在 `~/.dsh-minicode`（可用 `DSH_MINICODE_DATA_DIR` 改到别处，拒绝写到文件系统根目录；
+0.4.0 之前的 `~/.dsh-ugc-wiki` 会在首次启动时自动改名迁过去）：
 
 | 文件 | 内容 |
 | --- | --- |
@@ -182,7 +186,7 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 1. `ugc_ids lookup` 先命中官方表（也可按数字反查名字，如 `lookup 1001`）；
 2. 官方表里没有的（**变量ID、元件ID** 只存在于玩家自己的地图）才会问玩家：
    工具提示「不要编造 id」，并把需求写进 `ids.json` 的等待列表；
-3. 玩家在 设置 → UGC 百科 → **ID 登记** 填写；`source=player` 的值**永远优先**于官方表，
+3. 玩家在 设置 → MiniCode → **ID 登记** 填写；`source=player` 的值**永远优先**于官方表，
    重新同步官方表不会覆盖它；
 4. 同步时机：设置页`同步官方 ID 表`按钮随时可点；勾了`爬取后同步官方 ID 表`时，
    每次手动抓取 wiki 成功后还会顺带刷新这 8 张表。
@@ -201,7 +205,7 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 
 ### 刷新索引
 
-设置页点一下即可（结果写 `~/.dsh-ugc-wiki/index.json`）；也可以命令行重建随包数据：
+设置页点一下即可（结果写 `~/.dsh-minicode/index.json`）；也可以命令行重建随包数据：
 
 ```bash
 node scripts/build.mjs              # 在线抓取 wiki 并重建 data/ugc-wiki.json
@@ -214,7 +218,7 @@ node scripts/build.mjs --offline    # 用 _probe/pages 里的缓存页面重建�
 ## 结构
 
 ```
-index.js             cordis 插件：注册 12 个工具 + /ugc-wiki/api（无第三方依赖）
+index.js             cordis 插件：注册 12 个工具 + /dsh-minicode/api（无第三方依赖）
 client.js            浏览器端：设置页五个标签（window.__ModuleLoader__）
 lib/store.mjs        索引加载、IDF 加权检索、模块/页面解析
 lib/format.mjs       文本渲染（签名行 / 完整卡片 / 压缩卡片 / 模块表）
@@ -227,9 +231,9 @@ lib/config.mjs       自动维护开关（config.json）
 lib/update.mjs       GitHub 仓库查询：版本比较、star / issue、检查更新缓存
 lib/harvest.mjs      从语料里挖 id 数字（并统计各种 ID 的提及次数）
 lib/crawl.mjs        抓取 40 页并组装索引（在线 / 离线）
-lib/api.mjs          /ugc-wiki/api 路由与后台抓取任务
+lib/api.mjs          /dsh-minicode/api 路由与后台抓取任务
 lib/web.mjs          JSON 收发小工具
-lib/paths.mjs        数据目录（~/.dsh-ugc-wiki）
+lib/paths.mjs        数据目录（~/.dsh-minicode，含旧目录迁移）
 lib/jsonfile.mjs     原子读写 JSON
 lib/html.mjs         无依赖 HTML 树构建器（解析期用）
 scripts/build.mjs    命令行爬虫（调用 lib/crawl.mjs）
@@ -247,14 +251,14 @@ data/official-ids.json  官方 id 表快照（首次启动灌进 ID 登记表）
 想让插件在启动时留一行痕迹（确认 bundle 真的挂载了），给宿主进程加环境变量：
 
 ```
-DSH_UGC_DEBUG=<某个可写路径>   # apply() 结束后追加一行 "ugc-wiki applied: 12 tools, 571 apis, api /ugc-wiki/api"
+DSH_MINICODE_DEBUG=<某个可写路径>   # apply() 结束后追加一行 "dsh-minicode applied: 12 tools, 571 apis, api /dsh-minicode/api"
 ```
 
 不设这个变量时插件不写任何文件。
 
 给 `webServer.register()` **不要**挂 `sub.effect(() => dispose())`：在
 `ctx.inject(['webServer'], cb)` 的作用域里这个清理函数会立刻执行，路由被当场注销，
-所有 `/ugc-wiki/api/*` 请求就会落回 SPA 的 404（本插件踩过这个坑，注释里写了原因）。
+所有 `/dsh-minicode/api/*` 请求就会落回 SPA 的 404（本插件踩过这个坑，注释里写了原因）。
 
 ## 备注
 
