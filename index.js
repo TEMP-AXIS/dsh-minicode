@@ -1,4 +1,4 @@
-// @eastlake/ugc-wiki — offline MiniWorld UGC wiki lookup for the DSH agent.
+// dsh-minicode — offline MiniWorld UGC wiki lookup for the DSH agent.
 //
 // The heavy lifting happens once: lib/crawl.mjs downloads
 // https://dev-wiki.mini1.cn/ugc-wiki/ and lib/store.mjs turns it into one compact
@@ -13,13 +13,13 @@ import * as F from './lib/format.mjs';
 import * as M from './lib/memory.mjs';
 import * as T from './lib/templates.mjs';
 import * as I from './lib/ids.mjs';
-import { crawledIndexFile, dataDir } from './lib/paths.mjs';
+import { crawledIndexFile, dataDir, debugFile } from './lib/paths.mjs';
 import { getConfig } from './lib/config.mjs';
 import { seedFromBundle } from './lib/idsource.mjs';
 import { REPO_URL, STAR_URL, ISSUE_URL, refreshInBackground, updateInfo } from './lib/update.mjs';
 import { API_PREFIX, createApi } from './lib/api.mjs';
 
-export const name = 'ugc-wiki';
+export const name = 'dsh-minicode';
 export const inject = ['tools'];
 
 const BUNDLED_INDEX = fileURLToPath(new URL('./data/ugc-wiki.json', import.meta.url));
@@ -109,8 +109,9 @@ export function apply(ctx) {
   // the official tables, so ugc_ids works before anything is crawled.
   try {
     const seeded = seedFromBundle();
-    if (seeded && process.env.DSH_UGC_DEBUG) {
-      appendFileSync(process.env.DSH_UGC_DEBUG, 'ugc-wiki seeded ' + seeded.seeded + ' official ids\n');
+    const target = debugFile();
+    if (seeded && target) {
+      appendFileSync(target, 'dsh-minicode seeded ' + seeded.seeded + ' official ids\n');
     }
   } catch {
     /* an unwritable data dir just means ids stay empty until the player fills them */
@@ -120,8 +121,9 @@ export function apply(ctx) {
   // Settings page can switch it off (autoUpdate).
   if (getConfig().autoUpdate) {
     const trace = (message) => {
-      if (!process.env.DSH_UGC_DEBUG) return;
-      try { appendFileSync(process.env.DSH_UGC_DEBUG, 'ugc-wiki ' + message + '\n'); } catch { /* best effort */ }
+      const target = debugFile();
+      if (!target) return;
+      try { appendFileSync(target, 'dsh-minicode ' + message + '\n'); } catch { /* best effort */ }
     };
     refreshInBackground(trace).catch(() => {});
   }
@@ -581,14 +583,14 @@ export function apply(ctx) {
   // The route deliberately has NO effect disposer: inside a ctx.inject(['webServer'])
   // scope the effect disposer fires immediately (measured: "effect disposer ran"
   // right after register), which silently unregistered the route and made every
-  // /ugc-wiki/api request answer 404 from the SPA fallback.
+  // /dsh-minicode/api request answer 404 from the SPA fallback.
   if (typeof ctx.inject === 'function') {
     ctx.inject(['webServer'], (sub) => {
       const webServer = sub.webServer;
       if (!webServer || typeof webServer.register !== 'function') return;
       const log = (message) => {
         try {
-          const logger = typeof ctx.logger === 'function' ? ctx.logger('ugc-wiki') : null;
+          const logger = typeof ctx.logger === 'function' ? ctx.logger('dsh-minicode') : null;
           if (logger && typeof logger.debug === 'function') logger.debug(message);
         } catch {
           /* logging is best effort */
@@ -610,12 +612,13 @@ export function apply(ctx) {
     });
   }
 
-  // Opt-in boot trace: DSH_UGC_DEBUG=<file> appends one line after every
+  // Opt-in boot trace: DSH_MINICODE_DEBUG=<file> appends one line after every
   // register() call above has returned, which is the only cheap way to prove
   // the bundle mounted without a full GUI restart.
-  if (process.env.DSH_UGC_DEBUG) {
+  const traceTarget = debugFile();
+  if (traceTarget) {
     try {
-      appendFileSync(process.env.DSH_UGC_DEBUG, 'ugc-wiki applied: 12 tools, ' + store().apis.length + ' apis, api ' + API_PREFIX + '\n');
+      appendFileSync(traceTarget, 'dsh-minicode applied: 12 tools, ' + store().apis.length + ' apis, api ' + API_PREFIX + '\n');
     } catch {
       /* trace only */
     }
