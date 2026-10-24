@@ -1,0 +1,13 @@
+{
+  "topic": "拖动过程要轮询位置",
+  "wrong": "只在 TouchEnd 读一次位置，拖动时界面不跟着变",
+  "right": "TouchBegin 里 self:DoPeriodicTask(fn, 0.03, 0) 起循环轮询位置，任务存 per-player 表；TouchEnd 里 :Cancel() 并再读一次最终位置；UIHide / 玩家离开也要 Cancel",
+  "tags": [
+    "ui",
+    "slider",
+    "滑动",
+    "doperiodictask",
+    "轮询"
+  ],
+  "pinned": false
+}

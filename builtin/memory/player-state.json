@@ -1,0 +1,11 @@
+{
+  "topic": "每玩家状态与定时器生命周期",
+  "wrong": "顶层 local 表只增不减，定时器不停，玩家走了还在跑",
+  "right": "state[player] 在 OnUIHide（或玩家离开）里整体置 nil；每个 DoPeriodicTask 的任务都要在同一处 :Cancel()；只做界面业务的数据界面隐藏就销毁，要存档的才写进 Data",
+  "tags": [
+    "生命周期",
+    "state",
+    "定时器"
+  ],
+  "pinned": false
+}

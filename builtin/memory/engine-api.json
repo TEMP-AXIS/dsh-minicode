@@ -1,0 +1,13 @@
+{
+  "topic": "wiki 里查不到的引擎接口",
+  "wrong": "ugc_search 查 DoPeriodicTask / AddTriggerEvent / GetElementAttrValue 查不到，就以为不能用",
+  "right": "这三个是组件脚本自带的：self:AddTriggerEvent(TriggerEvent.X, self.Handler, 元件ID可省)；self:DoPeriodicTask(fn, 间隔秒, 0) 返回带 :Cancel() 的任务；CustomUI:GetElementAttrValue(player, 元件ID, ElementAttr.ScrollPosition)",
+  "tags": [
+    "ui",
+    "接口",
+    "引擎",
+    "addtriggerevent",
+    "doperiodictask"
+  ],
+  "pinned": true
+}

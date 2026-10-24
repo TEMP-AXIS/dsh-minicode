@@ -1,0 +1,13 @@
+{
+  "topic": "克隆元件的清理",
+  "wrong": "关闭界面只清 state，克隆元件留在界面上；或者每次 UIShow 都重新克隆一批，元件越堆越多",
+  "right": "每玩家存 cloneIds，OnUIHide 里 for 循环 CustomUI:DeleteElement(player, uiid, id)，再 state[player] = nil；只是暂时不显示的行用 HideElement 留着复用（先建满再逐行 Show/Hide）",
+  "tags": [
+    "ui",
+    "clone",
+    "克隆",
+    "生命周期",
+    "清理"
+  ],
+  "pinned": false
+}

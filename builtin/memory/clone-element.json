@@ -1,0 +1,13 @@
+{
+  "topic": "克隆元件（CustomUI:CloneElement）",
+  "wrong": "直接 CloneElement，然后拿模板元件的 ID 去 SetText/SetColor，以为克隆会把文本图片一起复制",
+  "right": "先把模板元件 HideElement，再 CloneElement(player, uiid, 模板ID)；返回的新ID形如「模板ID#cloneN」，克隆出来的元件不带文本/颜色，必须自己 SetText/SetColor/SetPosition；行内子元件ID = UI_ID .. 子后缀 .. clone:match(\"#clone%d+$\")",
+  "tags": [
+    "ui",
+    "clone",
+    "克隆",
+    "cloneelement",
+    "列表"
+  ],
+  "pinned": true
+}

@@ -1,0 +1,12 @@
+{
+  "topic": "界面 / 变量 / 组件 ID",
+  "wrong": "编造 v 开头的变量ID、c 开头的组件ID 或界面ID",
+  "right": "v**** 变量、c**** 组件、界面ID 都由玩家从编辑器里给；变量读写 Data:GetValue(varId, player) / Data:SetValue(varId, player, json.encode(t))，全局变量玩家参数传 nil；调别的组件用 GameObject:FindObject(对象ID):GetComponent(组件ID)",
+  "tags": [
+    "id",
+    "变量",
+    "组件",
+    "data"
+  ],
+  "pinned": false
+}

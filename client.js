@@ -17,7 +17,7 @@ window.__ModuleLoader__.load({
       en: { nav: 'UGC Wiki', close: 'Close', index: 'Index', memory: 'Memory', templates: 'Templates', ids: 'IDs', auto: 'Automation' },
     };
 
-    const CSS = ".ugcWrap{display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--dsw-alias-label-primary)}\n.ugcHead{display:flex;align-items:center;justify-content:space-between;gap:12px}\n.ugcTabs{display:flex;gap:6px;border-bottom:1px solid var(--dsw-alias-border-l1);padding-bottom:8px;flex-wrap:wrap}\n.ugcTab{padding:6px 12px;border-radius:var(--dsw-radius-sm);cursor:pointer;background:transparent;border:1px solid transparent;color:var(--dsw-alias-label-tertiary);font:inherit}\n.ugcTab[data-on='1']{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-border-l1)}\n.ugcCard{border:1px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-md);padding:12px;background:var(--dsw-alias-bg-layer-2);display:flex;flex-direction:column;gap:10px}\n.ugcGrid{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;align-items:center}\n.ugcMuted{color:var(--dsw-alias-label-tertiary);font-size:12px}\n.ugcBtn{padding:5px 12px;border-radius:var(--dsw-radius-sm);border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-overlay);color:var(--dsw-alias-label-primary);cursor:pointer;font:inherit}\n.ugcBtn:hover{background:var(--dsw-alias-interactive-bg-hover)}\n.ugcBtn:disabled{opacity:.45;cursor:default}\n.ugcBtnPrimary{background:var(--dsw-alias-brand-primary);border-color:var(--dsw-alias-brand-primary);color:#fff}\n.ugcInput,.ugcArea,.ugcSelect{width:100%;box-sizing:border-box;padding:6px 8px;border-radius:var(--dsw-radius-sm);border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-overlay);color:var(--dsw-alias-label-primary);font:inherit}\n.ugcArea{min-height:240px;font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.5;resize:vertical}\n.ugcList{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto}\n.ugcItem{border:1px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-sm);padding:8px 10px;display:flex;flex-direction:column;gap:4px}\n.ugcRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}\n.ugcProgress{height:6px;border-radius:3px;background:var(--dsw-alias-border-l1);overflow:hidden}\n.ugcBar{height:100%;background:var(--dsw-alias-brand-primary);transition:width .2s}\n.ugcErr{color:#d9534f}\n.ugcTag{display:inline-block;padding:1px 6px;border-radius:9px;border:1px solid var(--dsw-alias-border-l1);color:var(--dsw-alias-label-tertiary);font-size:11px}";
+    const CSS = ".ugcWrap{display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--dsw-alias-label-primary)}\n.ugcHead{display:flex;align-items:center;justify-content:space-between;gap:12px}\n.ugcTabs{display:flex;gap:6px;border-bottom:1px solid var(--dsw-alias-border-l1);padding-bottom:8px;flex-wrap:wrap}\n.ugcTab{padding:6px 12px;border-radius:var(--dsw-radius-sm);cursor:pointer;background:transparent;border:1px solid transparent;color:var(--dsw-alias-label-tertiary);font:inherit}\n.ugcTab[data-on='1']{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-border-l1)}\n.ugcCard{border:1px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-md);padding:12px;background:var(--dsw-alias-bg-layer-2);display:flex;flex-direction:column;gap:10px}\n.ugcGrid{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;align-items:center}\n.ugcMuted{color:var(--dsw-alias-label-tertiary);font-size:12px}\n.ugcBtn{padding:5px 12px;border-radius:var(--dsw-radius-sm);border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-overlay);color:var(--dsw-alias-label-primary);cursor:pointer;font:inherit}\n.ugcBtn:hover{background:var(--dsw-alias-interactive-bg-hover)}\n.ugcBtn:disabled{opacity:.45;cursor:default}\n.ugcBtnPrimary{background:var(--dsw-alias-brand-primary);border-color:var(--dsw-alias-brand-primary);color:#fff}\n.ugcInput,.ugcArea,.ugcSelect{width:100%;box-sizing:border-box;padding:6px 8px;border-radius:var(--dsw-radius-sm);border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-overlay);color:var(--dsw-alias-label-primary);font:inherit}\n.ugcArea{min-height:240px;font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.5;resize:vertical}\n.ugcCode{max-height:420px;overflow:auto;margin:0;padding:10px;border-radius:var(--dsw-radius-sm);border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-overlay);font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.5;white-space:pre}\n.ugcList{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto}\n.ugcItem{border:1px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-sm);padding:8px 10px;display:flex;flex-direction:column;gap:4px}\n.ugcRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}\n.ugcProgress{height:6px;border-radius:3px;background:var(--dsw-alias-border-l1);overflow:hidden}\n.ugcBar{height:100%;background:var(--dsw-alias-brand-primary);transition:width .2s}\n.ugcErr{color:#d9534f}\n.ugcTag{display:inline-block;padding:1px 6px;border-radius:9px;border:1px solid var(--dsw-alias-border-l1);color:var(--dsw-alias-label-tertiary);font-size:11px}";
 
     function request(path, init) {
       const options = Object.assign({ headers: { 'content-type': 'application/json' } }, init || {});
@@ -182,32 +182,19 @@ window.__ModuleLoader__.load({
     }
     function MemoryTab() {
       const [state, reload] = useLoad(() => request('/memory'));
-      const [form, setForm] = useState({ topic: '', wrong: '', right: '', tags: '' });
-      const [error, setError] = useState('');
+      const [note, setNote] = useState('');
       const data = state.data || { items: [], misses: [] };
 
-      function set(key) { return (value) => setForm((prev) => Object.assign({}, prev, { [key]: value })); }
-
-      function add() {
-        if (!form.topic && !form.right) { setError('至少填「主题」或「正确写法」'); return; }
-        request('/memory', { method: 'POST', body: JSON.stringify({ action: 'add', topic: form.topic, wrong: form.wrong, right: form.right, tags: form.tags }) })
-          .then(() => { setForm({ topic: '', wrong: '', right: '', tags: '' }); setError(''); reload(); })
-          .catch((err) => setError(String(err.message || err)));
-      }
-
       function act(payload) {
-        request('/memory', { method: 'POST', body: JSON.stringify(payload) }).then(reload).catch((err) => setError(String(err.message || err)));
+        request('/memory', { method: 'POST', body: JSON.stringify(payload) })
+          .then(() => { setNote(''); reload(); })
+          .catch((err) => setNote(String(err.message || err)));
       }
 
       return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12 } },
         h('div', { className: 'ugcCard' },
-          h('div', { className: 'ugcMuted' }, '记下经常出错的地方：写入后，ugc_search / ugc_pack 命中相关查询时会自动附上。'),
-          h(Field, { label: '主题', value: form.topic, onChange: set('topic'), placeholder: 'SetTeam 参数顺序' }),
-          h(Field, { label: '常见错误', value: form.wrong, onChange: set('wrong'), placeholder: '第一个参数传的是玩家 objid' }),
-          h(Field, { label: '正确写法', value: form.right, onChange: set('right'), placeholder: 'Actor:SetTeam(teamId, objid) 队伍在前' }),
-          h(Field, { label: '标签', value: form.tags, onChange: set('tags'), placeholder: 'team actor 队伍' }),
-          h('div', { className: 'ugcRow' }, h(Btn, { primary: true, onClick: add }, '记住这一条')),
-          h(Notice, { text: error, error: true })
+          h('div', { className: 'ugcMuted' }, '记忆由 AI 在任务里自己记（ugc_memory action=add），随插件发布的那批在 builtin/memory/*.json。'),
+          h('div', { className: 'ugcMuted' }, '页面上不能手动新增；想补一条，改 builtin/memory/<id>.json 提 PR。')
         ),
         h('div', { className: 'ugcCard' },
           h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
@@ -230,7 +217,8 @@ window.__ModuleLoader__.load({
                   h('div', null, '正确: ' + (item.right || '(未填)')),
                   (item.tags || []).length ? h('div', { className: 'ugcRow' }, item.tags.map((tag) => h('span', { className: 'ugcTag', key: tag }, tag))) : null
                 )
-              ))
+              )),
+          h(Notice, { text: note, error: true })
         ),
         h('div', { className: 'ugcCard' },
           h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
@@ -243,10 +231,7 @@ window.__ModuleLoader__.load({
                 h('div', { className: 'ugcItem', key: miss.q + miss.kind },
                   h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
                     h('span', null, miss.q + '  (' + miss.kind + ' x' + (miss.count || 1) + ')'),
-                    h('span', { className: 'ugcRow' },
-                      h(Btn, { onClick: () => setForm((prev) => Object.assign({}, prev, { topic: miss.q })) }, '写成记忆'),
-                      h(Btn, { onClick: () => act({ action: 'drop-miss', q: miss.q, kind: miss.kind }) }, '忽略')
-                    )
+                    h(Btn, { onClick: () => act({ action: 'drop-miss', q: miss.q, kind: miss.kind }) }, '忽略')
                   )
                 )
               ))
@@ -256,49 +241,39 @@ window.__ModuleLoader__.load({
 
     function TemplatesTab() {
       const [list, reloadList] = useLoad(() => request('/templates'));
-      const [draft, setDraft] = useState({ id: '', name: '', desc: '', tags: '', code: '', builtin: false });
+      const [item, setItem] = useState(null);
       const [error, setError] = useState('');
       const [note, setNote] = useState('');
       const items = (list.data && list.data.items) || [];
 
-      function open(id) {
+      function view(id) {
         request('/templates?id=' + encodeURIComponent(id))
-          .then((data) => setDraft({ id: data.item.id, name: data.item.name, desc: data.item.desc || '', tags: (data.item.tags || []).join(' '), code: data.item.code, builtin: data.item.builtin === true }))
-          .catch((err) => setError(String(err.message || err)));
-      }
-
-      function save() {
-        const payload = {
-          action: 'save',
-          id: draft.builtin ? '' : draft.id,
-          name: draft.builtin ? draft.name + '（副本）' : (draft.name || '未命名模板'),
-          desc: draft.desc,
-          tags: draft.tags,
-          code: draft.code,
-        };
-        request('/templates', { method: 'POST', body: JSON.stringify(payload) })
-          .then((data) => { setDraft({ id: data.item.id, name: data.item.name, desc: data.item.desc || '', tags: (data.item.tags || []).join(' '), code: data.item.code, builtin: false }); setNote('已保存 ' + data.item.name); setError(''); reloadList(); })
+          .then((data) => { setItem(data.item); setNote(''); setError(''); })
           .catch((err) => setError(String(err.message || err)));
       }
 
       function remove(id) {
         request('/templates', { method: 'POST', body: JSON.stringify({ action: 'delete', id: id }) })
-          .then(() => { setNote('已删除 ' + id); reloadList(); })
+          .then(() => { setNote('已删除 ' + id); setItem(null); reloadList(); })
           .catch((err) => setError(String(err.message || err)));
       }
 
       return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12 } },
         h('div', { className: 'ugcCard' },
+          h('div', { className: 'ugcMuted' }, '模板由 AI 自己存（ugc_template action=save），随插件发布的那批在 builtin/templates/*.lua。'),
+          h('div', { className: 'ugcMuted' }, '页面上不能手动新增；想加一个，复制过去改改提 PR 就行。')
+        ),
+        h('div', { className: 'ugcCard' },
           h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
             h('strong', null, '模板库（' + items.length + ' 个）'),
-            h(Btn, { onClick: () => { setDraft({ id: '', name: '', desc: '', tags: '', code: '-- 行为脚本骨架\nlocal Script = {}\n\nfunction Script:OnGameStart(event)\nend\n\nfunction Script:OnStart()\n  self:AddTriggerEvent(TriggerEvent.GameStart, self.OnGameStart)\nend\n\nreturn Script', builtin: false }); setNote(''); } }, '新建模板')
+            h(Btn, { onClick: reloadList }, '刷新')
           ),
           h('div', { className: 'ugcList' }, items.map((item) =>
             h('div', { className: 'ugcItem', key: item.id },
               h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
                 h('span', null, item.name + (item.builtin ? ' [内置]' : '')),
                 h('span', { className: 'ugcRow' },
-                  h(Btn, { onClick: () => open(item.id) }, '查看/编辑'),
+                  h(Btn, { onClick: () => view(item.id) }, '查看'),
                   item.builtin ? null : h(Btn, { onClick: () => remove(item.id) }, '删除')
                 )
               ),
@@ -307,18 +282,18 @@ window.__ModuleLoader__.load({
             )
           ))
         ),
-        h('div', { className: 'ugcCard' },
-          h(Field, { label: '名称', value: draft.name, onChange: (v) => setDraft((p) => Object.assign({}, p, { name: v })) }),
-          h(Field, { label: '说明', value: draft.desc, onChange: (v) => setDraft((p) => Object.assign({}, p, { desc: v })) }),
-          h(Field, { label: '标签', value: draft.tags, onChange: (v) => setDraft((p) => Object.assign({}, p, { tags: v })) }),
-          h('textarea', { className: 'ugcArea', value: draft.code, onChange: (e) => setDraft((p) => Object.assign({}, p, { code: e.target.value })) }),
-          h('div', { className: 'ugcRow' },
-            h(Btn, { primary: true, onClick: save }, draft.builtin ? '另存为副本' : '保存模板'),
-            h('span', { className: 'ugcMuted' }, draft.builtin ? '内置模板只读，保存会生成副本' : (draft.id ? '编辑 ' + draft.id : '新模板'))
-          ),
-          h(Notice, { text: note }),
-          h(Notice, { text: error, error: true })
-        )
+        item
+          ? h('div', { className: 'ugcCard' },
+              h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
+                h('strong', null, item.name + (item.builtin ? ' [内置]' : '')),
+                h(Btn, { onClick: () => setItem(null) }, '收起')
+              ),
+              h('div', { className: 'ugcMuted' }, (item.desc || '(无说明)') + ' · ' + item.id + (item.builtin ? ' · builtin/templates/' + item.id + '.lua' : '')),
+              h('pre', { className: 'ugcCode' }, item.code)
+            )
+          : null,
+        h(Notice, { text: note }),
+        h(Notice, { text: error, error: true })
       );
     }
 

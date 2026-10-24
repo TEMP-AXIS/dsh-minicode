@@ -1,0 +1,12 @@
+{
+  "topic": "TurnSliderToPos 回写打架",
+  "wrong": "数值一变就 TurnSliderToPos，拖动时手指位置被拽回去、数值来回跳",
+  "right": "用 active 标志：拖动中只更新数值、不写回位置，松手后再 TurnSliderToPos；坐标换算先 math.max(0, math.min(1, ratio)) 再乘范围",
+  "tags": [
+    "ui",
+    "slider",
+    "滑动",
+    "turnslidertopos"
+  ],
+  "pinned": false
+}

@@ -1,0 +1,13 @@
+{
+  "topic": "克隆元件的点击事件",
+  "wrong": "给每个克隆ID单独 AddTriggerEvent（克隆ID运行时才存在，OnStart 注册时还没有）",
+  "right": "TriggerEvent.UIButtonClick 只注册一次，回调里用 event.uielement 去 cloneMap[clickedId] 反查业务数据，反查不到就 return",
+  "tags": [
+    "ui",
+    "clone",
+    "event",
+    "uielement",
+    "点击"
+  ],
+  "pinned": false
+}

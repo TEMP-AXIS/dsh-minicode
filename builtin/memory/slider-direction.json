@@ -1,0 +1,12 @@
+{
+  "topic": "滑块坐标方向",
+  "wrong": "假设 pos.x 越大数值越大，或直接把像素当数值用",
+  "right": "样例是反向换算：(SLIDER_W - pos.x) / SLIDER_W，回写时 (1 - ratio) * SLIDER_W；方向按界面实际摆法调，两端用 clamp 兜住，TouchEnd 再算一次",
+  "tags": [
+    "ui",
+    "slider",
+    "滑动",
+    "坐标"
+  ],
+  "pinned": false
+}

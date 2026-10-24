@@ -1,0 +1,12 @@
+{
+  "topic": "大量克隆要分帧",
+  "wrong": "一个 for 循环连续克隆几十上百个元件，打开界面直接卡一下",
+  "right": "循环里每 6 个 threadpool:wait(0.01)；一批克隆完再统一 SetText/SetPosition/ShowElement",
+  "tags": [
+    "ui",
+    "clone",
+    "threadpool",
+    "性能"
+  ],
+  "pinned": false
+}

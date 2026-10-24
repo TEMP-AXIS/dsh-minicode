@@ -1,0 +1,12 @@
+{
+  "topic": "滑动条取值（滚动面板）",
+  "wrong": "用 UIButtonClick 或文本事件去读滑块位置，拖动过程中数值根本不动",
+  "right": "TriggerEvent.UIScrollPaneTouchBegin / UIScrollPaneTouchEnd 注册时第三个参数写滑动元件ID；位置用 CustomUI:GetElementAttrValue(player, 滑动元件ID, ElementAttr.ScrollPosition) 取，返回 {x=,y=}",
+  "tags": [
+    "ui",
+    "slider",
+    "滑动",
+    "scrollpane"
+  ],
+  "pinned": true
+}

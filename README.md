@@ -98,10 +98,13 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
    `检查更新` 按钮（读 GitHub，显示 star / issue 数和最新提交）、以及仓库 / Star / Issue 三个链接。
 2. **记忆** — 记录「常出错的地方」：主题 / 常见错误 / 正确写法 / 标签。
    命中相关查询时，`ugc_search` / `ugc_api` / `ugc_pack` 会在结果末尾自动附上这些纠错；
-   置顶的条目还会进 `ugc_guide`。下方列出「查不到的问题」（零命中的搜索自动记录），可一键转成记忆。
-   12 条**内置记忆**只读（见「内置记忆与模板」一节），自己记的条目可编辑、可删。
+   置顶的条目还会进 `ugc_guide`。**这一页只读**：条目要么随插件发布（12 条内置），
+   要么由 AI 在任务中自己记（`ugc_memory action=add`）；页面上不能手动新增，
+   人工补条目走 `builtin/memory/*.json` 的 PR（见 [CONTRIBUTING.md](CONTRIBUTING.md)）。
+   下方列出「查不到的问题」（零命中的搜索自动记录），可以忽略或清空。
 3. **模板** — 7 个内置模板（行为脚本骨架、界面组件骨架、克隆元件列表、滑动条、长按连续触发、
-   跨组件调用、玩家配置读写）只读，可`另存为副本`；自定义模板可编辑、可删。
+   跨组件调用、玩家配置读写）+ AI 自己存的模板，**只能查看**（点「查看」展开源码）。
+   同样不能手动新增：人工加模板改 `builtin/templates/*.lua` 提 PR。
 4. **ID 登记** — 见下节；顶部有`同步官方 ID 表`按钮（8 张表，同步中会显示进度）。
 5. **自动维护** — 四个开关，默认全开：`自动记忆`（AI 收尾时自己记纠错）、
    `自动模板`（AI 自己把验证过的脚本存成模板）、`爬取后同步官方 ID 表`、`自动检查更新`。
@@ -112,8 +115,8 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 
 | 文件 | 内容 |
 | --- | --- |
-| `memory.json` | 易错点记忆（自己记的）+ 查不到的问题（上限 400 / 80；内置 12 条不写盘） |
-| `templates.json` | 自定义模板（内置 7 个不写盘） |
+| `memory.json` | AI 记下的记忆 + 查不到的问题（上限 400 / 80；内置 12 条不写盘） |
+| `templates.json` | AI 存下的模板（内置 7 个不写盘） |
 | `ids.json` | 已登记 id（来源 `player` / `official` / `harvest`）+ 待填写请求 |
 | `config.json` | 四个开关（`autoMemory` / `autoTemplates` / `autoIds` / `autoUpdate`） |
 | `update.json` | 最近一次 GitHub 更新检查的缓存（版本、star、issue、最新提交，6 小时有效） |
@@ -122,7 +125,8 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 ## 内置记忆与模板
 
 这两张表是照着一套真实的迷你世界 UGC 工程（10 个组件、约 200 KB Lua）总结出来的，随插件发布、只读，
-在 `ugc_memory` / `ugc_template` 里标 `[内置]`；不想要就改 `lib/memory.mjs` 的 `SEED` 或 `lib/templates.mjs` 的 `META`。
+在 `ugc_memory` / `ugc_template` 里标 `[内置]`。**一个条目一个文件**：`builtin/memory/<id>.json`、`builtin/templates/<id>.lua`，
+加一条就是加一个文件、提一个 PR —— 格式和自查命令见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 **12 条记忆**（前三条置顶，直接进 `ugc_guide`）：
 
@@ -214,8 +218,9 @@ index.js             cordis 插件：注册 12 个工具 + /ugc-wiki/api（无�
 client.js            浏览器端：设置页五个标签（window.__ModuleLoader__）
 lib/store.mjs        索引加载、IDF 加权检索、模块/页面解析
 lib/format.mjs       文本渲染（签名行 / 完整卡片 / 压缩卡片 / 模块表）
-lib/memory.mjs       易错点记忆 + 查不到的问题（含 12 条只读内置记忆）
-lib/templates.mjs    模板库（7 个只读内置模板 + 自定义）
+lib/memory.mjs       易错点记忆 + 查不到的问题（内置记忆从 builtin/ 读）
+lib/templates.mjs    模板库（内置模板从 builtin/ 读 + AI 自存的）
+lib/builtin.mjs      内置记忆 / 模板的加载器（一个文件一条，启动时读一次）
 lib/ids.mjs          ID 登记表 + 待填写请求 + 官方表批量导入
 lib/idsource.mjs     旧官网 8 张 id 表的下载与解析（developers.mini1.cn）
 lib/config.mjs       自动维护开关（config.json）
@@ -229,6 +234,10 @@ lib/jsonfile.mjs     原子读写 JSON
 lib/html.mjs         无依赖 HTML 树构建器（解析期用）
 scripts/build.mjs    命令行爬虫（调用 lib/crawl.mjs）
 scripts/parse.mjs    单页解析（四种页面形状）
+scripts/check-contrib.mjs  校验 builtin/ 里的记忆和模板（PR 前跑，npm test 也跑）
+builtin/memory/*.json      12 条内置记忆，一个文件一条
+builtin/templates/*.lua    7 个内置模板，一个文件一个脚本
+CONTRIBUTING.md      怎么加一条记忆 / 一个模板（一个文件一个 PR）
 data/ugc-wiki.json   构建产物
 data/official-ids.json  官方 id 表快照（首次启动灌进 ID 登记表）
 ```
