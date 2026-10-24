@@ -1,0 +1,51 @@
+{
+  "name": "dsh-ugc-wiki",
+  "version": "0.1.0",
+  "description": "迷你世界 UGC wiki 离线索引 (MiniWorld UGC wiki offline index) for DeepSeek Harness: crawls dev-wiki.mini1.cn/ugc-wiki once, then answers API/event/enum/doc lookups from a bundled JSON index in a few hundred tokens.",
+  "type": "module",
+  "engines": {
+    "node": "^22.15.0 || >=24.0.0"
+  },
+  "main": "./index.js",
+  "icon": "./icon.svg",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib/",
+    "data/",
+    "scripts/",
+    "cordis.patch.yml",
+    "README.md",
+    "icon.svg"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:offline": "node scripts/build.mjs --offline",
+    "test": "node scripts/_smoke.mjs"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "miniworld",
+    "ugc",
+    "wiki",
+    "lua"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  }
+}

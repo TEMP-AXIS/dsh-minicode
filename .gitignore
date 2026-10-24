@@ -1,0 +1,9 @@
+node_modules/
+
+# Scratch space: extracted copies of the DSH application bundle (third-party
+# code, 5 MB) and throwaway network test data.
+_probe/asar_out/
+_probe/tmp*/
+_probe/*.log
+data/_fresh.json
+*.tmp

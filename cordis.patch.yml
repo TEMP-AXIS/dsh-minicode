@@ -1,0 +1,9 @@
+# dsh-ugc-wiki bundle patch.
+#
+# One host row: the plugin that registers the ugc_* lookup tools. The index
+# itself ships as data/ugc-wiki.json, so nothing is fetched at answer time.
+
+- insert:
+    - id: ugc-wiki
+      name: 'dsh-ugc-wiki'
+      config: {}
