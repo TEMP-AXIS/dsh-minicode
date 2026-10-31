@@ -1,0 +1,13 @@
+{
+  "topic": "模块函数必须冒号调用",
+  "wrong": "写 Actor.GetPosition(objid) 这种点调用：objid 被当成 self，真正的参数是 nil，返回 nil,nil,nil 而且不抛错，看起来像引擎没实现",
+  "right": "一律用冒号：Actor:GetPosition(objid)、Player:GetRayOriginPos(objid)、Chat:SendSystemMsg(text, objid)。冒号调用前自检一次返回值，拿到 nil 先怀疑调用形式而不是接口不存在",
+  "tags": [
+    "冒号",
+    "调用形式",
+    "静默 nil",
+    "Actor",
+    "Player"
+  ],
+  "pinned": true
+}

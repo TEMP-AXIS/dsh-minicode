@@ -1,0 +1,12 @@
+{
+  "topic": "地形与生物群系枚举",
+  "wrong": "以为 TerrainType 是 1 起（把 Flat 当 1），或者把 World:GetBiomeType 的返回值当成只有几种",
+  "right": "TerrainType 是 Flat=0 / Normal=1；BiomeType 是一张 106 项的表，同样 0 起（0 迷拉星浅海、3 迷拉星森林 … 105 星尘之境虚空）。GetBiomeType 的参数形态要现场试（先传 x,z，再退回 x,z,0），拿到的数字先 pairs(BiomeType) 反查键名",
+  "tags": [
+    "地形",
+    "BiomeType",
+    "TerrainType",
+    "GetBiomeType"
+  ],
+  "pinned": false
+}

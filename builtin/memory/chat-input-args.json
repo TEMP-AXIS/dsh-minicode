@@ -1,0 +1,12 @@
+{
+  "topic": "聊天指令事件的参数形态",
+  "wrong": "直接按 wiki 写 function Script:OnInput(content, objid)，真机上第一个参数可能是一个 table，于是 content 拿到 nil，所有指令都不响应",
+  "right": "TriggerEvent.PlayerNewInputContent 的参数有两种形态，handler 里兼容取值：if type(p1) == \"string\" then content, objid = p1, p2 elseif type(p1) == \"table\" then content, objid = p1.content, p1.eventobjid end。取完先 trim，再按关键词分发，回话统一走 Chat:SendSystemMsg(text, objid)",
+  "tags": [
+    "触发事件",
+    "PlayerNewInputContent",
+    "参数兼容",
+    "聊天指令"
+  ],
+  "pinned": false
+}

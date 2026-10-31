@@ -1,7 +1,7 @@
 {
   "name": "dsh-minicode",
-  "version": "0.4.0",
-  "description": "MiniWorld (迷你世界) UGC wiki as a local index for DeepSeek Harness. Twelve agent tools answer API, event, enum, doc and id lookups from a bundled index in a few hundred tokens: one click crawls the wiki when you want it fresh, and nothing is fetched, parsed or opened at query time.",
+  "version": "0.5.0",
+  "description": "MiniWorld (迷你世界) UGC wiki as a local index for DeepSeek Harness. Twelve agent tools answer API, event, enum, doc and id lookups from a bundled index in a few hundred tokens. The index and the ~26.5k-name id tables ship inside the plugin: nothing is fetched, crawled or opened at runtime.",
   "type": "module",
   "engines": {
     "node": "^22.15.0 || >=24.0.0"
@@ -31,6 +31,7 @@
     "scripts/",
     "cordis.patch.yml",
     "README.md",
+    "CHANGELOG.md",
     "CONTRIBUTING.md",
     "icon.svg"
   ],

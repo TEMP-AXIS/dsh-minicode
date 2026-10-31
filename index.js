@@ -524,7 +524,7 @@ export function apply(ctx) {
 
   ctx.tools.register({
     name: 'ugc_ids',
-    description: 'The id registry. The UGC wiki names ids (道具ID, 方块ID, 特效ID, 音效ID, 生物ID, 粒子特效ID, 动作ID, 图片ID) but never prints the numbers; the older official site does, so the registry is seeded with ~4150 official block/item/creature/particle/sound/buff/act/picture ids (同步官方ID表 in Settings refreshes them). 变量/元件 ids only exist inside the player project. action=lookup returns known values; when nothing matches it records a request and tells you to ask the player. action=set stores the value the player gave.',
+    description: 'The id registry. The UGC wiki names ids (道具ID, 方块ID, 特效ID, 音效ID, 生物ID, 粒子特效ID, 动作ID, 图片ID) but never prints the numbers. The registry ships with the complete id tables - ~26.5k names over 14 kinds: 道具 17838, 特效 2533, 方块 950, 模型 912, 生物 909, 皮肤 601, buff 544, 图片 526, 音效 494, 粒子 314, 法术 300, 坐骑技能 273, 动作 241, 附魔 58 - imported unfiltered, so reserved ranges and placeholder rows are in there too. 变量/元件 ids only exist inside the player project. action=lookup returns known values; when nothing matches it records a request and tells you to ask the player. action=set stores the value the player gave.',
     parameters: {
       action: { type: 'string', required: true, enum: ['lookup', 'set', 'list', 'request', 'pending'], description: 'lookup: find ids by name. set: store a player-answered id. list: browse. request: record a need. pending: unanswered requests.' },
       kind: { type: 'string', description: 'Id kind: item, block, effect, sound, creature, particle, buff, ui, var, comp, custom.' },
@@ -542,7 +542,7 @@ export function apply(ctx) {
         if (!name) throw new Error('ugc_ids lookup needs name');
         const hits = I.findIds(name, kind || '');
         if (hits.length) {
-          const sourceLabel = { player: '玩家登记', official: '官方ID表', harvest: 'wiki 提取' };
+          const sourceLabel = { player: '玩家填写', official: '内置ID表', harvest: 'wiki 提取' };
           const lines = hits.map((item) => '- ' + I.kindLabel(item.kind) + ' "' + item.name + '" = ' + item.value + (item.note ? '  (' + F.trunc(item.note, 60) + ')' : '') + '  [' + (sourceLabel[item.source] || 'wiki 提取') + ']');
           return { text: '已知 ' + hits.length + ' 条：\n' + lines.join('\n') };
         }
@@ -571,7 +571,7 @@ export function apply(ctx) {
       }
       const list = I.listIds({ q: args.q, kind: kind || '', limit: 200 });
       if (!list.items.length) return { text: '还没有登记任何 id。用 ugc_ids(action=lookup) 查，或让玩家在设置页填写。' };
-      const listLabel = { player: '玩家', official: '官方', harvest: 'wiki' };
+      const listLabel = { player: '玩家', official: '内置', harvest: 'wiki' };
       const lines = list.items.map((item) => '- ' + I.kindLabel(item.kind) + ' "' + item.name + '" = ' + item.value + '  [' + (listLabel[item.source] || 'wiki') + ']');
       return { text: list.total + ' 条 id：\n' + lines.join('\n') + (list.pending.length ? '\n待填写: ' + list.pending.length + ' 条' : '') };
     },
@@ -598,10 +598,7 @@ export function apply(ctx) {
       };
       const handler = createApi({
         indexInfo: indexInfo,
-        reloadStore: reloadStore,
         dataDir: dataDir,
-        cacheDir: PROJECT_DIR + '_probe/pages',
-        homeFile: PROJECT_DIR + '_probe/home.html',
         log: log,
       });
       try {

@@ -1,0 +1,12 @@
+{
+  "topic": "描述文本里的富文本标记",
+  "wrong": "把 Item:GetItemName / GetItemDesc、Block:GetBlockDefDesc 的返回值原样丢给玩家，于是聊天框里出现 @item_102#、#c0aba1d、#r、#n 这些标记",
+  "right": "先清洗：@item_(%d+)# 换成 [道具名]（能查到就填真名）、#%w+ 和残留的 # 全删。正文里不会出现 # 号，所以可以放心激进删除；Chat:SendSystemMsg 也不认这些标记",
+  "tags": [
+    "富文本",
+    "GetItemDesc",
+    "清洗",
+    "聊天"
+  ],
+  "pinned": false
+}

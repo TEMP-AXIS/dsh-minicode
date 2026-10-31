@@ -1,0 +1,12 @@
+{
+  "topic": "天气枚举用 GroupWeatherType",
+  "wrong": "用 WeatherType 去映射 World:GetGroupWeather 的返回值：WeatherType 里混着 Custom / None / UnderWater / VoidNight / ZOMBIE_WAVE 等历史别名，还有重复键，映射出来是错的",
+  "right": "GroupWeatherType 是干净的 12 项，0 起：ShineAndRain=0 Shine=1 Rain=2 Thunder=3 Bad=4 Snow=5 Sandduststorm=6 Tempest=7 Blizzard=8 MeteorShower=9 Aurora=10 VoidFog=11。拿返回值反查键名，查不到再退回编号，别硬编码中文表",
+  "tags": [
+    "天气",
+    "GroupWeatherType",
+    "GetGroupWeather",
+    "枚举"
+  ],
+  "pinned": false
+}

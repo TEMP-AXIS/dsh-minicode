@@ -1,0 +1,13 @@
+{
+  "topic": "枚举的真名和隐藏值",
+  "wrong": "照 wiki 写 ItemId / ActorType 去取枚举表，取到 nil；又或者按自己的猜测给枚举编数字",
+  "right": "真机里 ItemId 叫 GridAttr、ActorType 叫 ObjType，其余如 TerrainType / GroupWeatherType / RayDetectType / CreatureAttr 都是全局表，可以直接 pairs 出来打印。wiki 没写的隐藏值以真机打印结果为准，不要猜编码",
+  "tags": [
+    "枚举",
+    "GridAttr",
+    "ObjType",
+    "全局表",
+    "真机"
+  ],
+  "pinned": false
+}

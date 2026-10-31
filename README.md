@@ -6,18 +6,21 @@
 [![license](https://img.shields.io/github/license/TEMP-AXIS/dsh-minicode?style=flat-square)](https://github.com/TEMP-AXIS/dsh-minicode/blob/main/LICENSE)
 
 MiniWorld (迷你世界) UGC 开发文档（<https://dev-wiki.mini1.cn/ugc-wiki/>）的**离线索引 + 查询工具**，
-给 DeepSeek Harness 的 agent 用：爬虫按需跑（在设置页点按钮），回答期只读一个 692 KiB 的 JSON，
-单次查询通常只花几百 token，不需要联网、不需要 SQLite、没有原生依赖。
+给 DeepSeek Harness 的 agent 用：索引和 ID 表都**随插件一起发布**，运行时只读本地 JSON，
+单次查询通常只花几百 token，不联网、不抓取任何站点、不需要 SQLite、没有原生依赖。
 
 除了 12 个给 agent 的 `ugc_*` 工具，插件还在 DSH 设置页里加了一页 **MiniCode**：
-索引状态与手动抓取、易错点记忆、代码模板库、ID 登记表、自动维护开关。
+索引状态、易错点记忆、代码模板库、ID 登记表、自动维护开关。
 
 记忆和模板都是**由 AI 自己维护**的：`ugc_guide` 里带着「收尾时自己记一条 / 自己存模板」的规则，
-设置页的自动维护标签只负责开或关；另外随插件附了 12 条只读记忆和 7 个只读模板（照一套真实工程总结，见「内置记忆与模板」）。
-ID 表另有一个官方来源（见「ID」一节）。
+设置页的自动维护标签只负责开或关；另外随插件附了 22 条只读记忆和 10 个只读模板（照一套真实工程与一批真机 API 实测总结，见「内置记忆与模板」）。
+ID 表随插件内置 14 类、约 2.65 万个名字（见「ID」一节）。
 
 > 0.4.0 起插件名是 **dsh-minicode**（原来叫 dsh-ugc-wiki）：包名、设置页标题、数据目录都跟着改了，
 > 只有给 agent 的 12 个工具仍叫 `ugc_*` —— 那是它们真正在做的事（查 UGC 百科），改名会让提示词和已有菜谱全部失效。
+
+> 0.5.0 起**运行时不再联网抓任何站点**：ID 表改为随包内置的全量表（14 类 / 26493 个名字，含方块 950、
+> 道具 17838），设置页的「同步官方 ID 表」和索引爬取按钮都已删除；内置记忆 12 → 22 条、模板 7 → 10 个。
 
 ## 开源地址
 
@@ -95,23 +98,23 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 
 五个标签页，全部走宿主端 `/dsh-minicode/api`（同一个插件注册的 HTTP 前缀）：
 
-1. **索引** — 索引来源（插件内置 / 手动抓取）、文件路径、构建时间、wiki 更新、条目统计、数据目录；
-   按钮：`立即抓取 wiki`（后台任务 + 进度条，可取消）、`从 wiki 提取内置 id`、`刷新`。
-   **抓取只在点按钮时发生**，插件启动、agent 调用都不会联网。卡片底部是版本区：当前版本、
+1. **索引** — 索引来源（插件内置 / 自备 index.json）、文件路径、构建时间、wiki 更新、条目统计、数据目录；
+   只有 `刷新` 一个按钮。**插件不抓取任何站点**：索引随包发布，想换就自己把 index.json 放进数据目录。
+   卡片底部是版本区：当前版本、
    `检查更新` 按钮（读 GitHub，显示 star / issue 数和最新提交）、以及仓库 / Star / Issue 三个链接。
 2. **记忆** — 记录「常出错的地方」：主题 / 常见错误 / 正确写法 / 标签。
    命中相关查询时，`ugc_search` / `ugc_api` / `ugc_pack` 会在结果末尾自动附上这些纠错；
-   置顶的条目还会进 `ugc_guide`。**这一页只读**：条目要么随插件发布（12 条内置），
+   置顶的条目还会进 `ugc_guide`。**这一页只读**：条目要么随插件发布（22 条内置），
    要么由 AI 在任务中自己记（`ugc_memory action=add`）；页面上不能手动新增，
    人工补条目走 `builtin/memory/*.json` 的 PR（见 [CONTRIBUTING.md](CONTRIBUTING.md)）。
    下方列出「查不到的问题」（零命中的搜索自动记录），可以忽略或清空。
-3. **模板** — 7 个内置模板（行为脚本骨架、界面组件骨架、克隆元件列表、滑动条、长按连续触发、
-   跨组件调用、玩家配置读写）+ AI 自己存的模板，**只能查看**（点「查看」展开源码）。
+3. **模板** — 10 个内置模板（行为脚本骨架、界面组件骨架、克隆元件列表、滑动条、长按连续触发、
+   跨组件调用、玩家配置读写、聊天指令、API 自检、定时任务）+ AI 自己存的模板，**只能查看**（点「查看」展开源码）。
    同样不能手动新增：人工加模板改 `builtin/templates/*.lua` 提 PR。
-4. **ID 登记** — 见下节；顶部有`同步官方 ID 表`按钮（8 张表，同步中会显示进度）。
-5. **自动维护** — 四个开关，默认全开：`自动记忆`（AI 收尾时自己记纠错）、
-   `自动模板`（AI 自己把验证过的脚本存成模板）、`爬取后同步官方 ID 表`、`自动检查更新`。
-   前三个关掉只是让 agent 不再主动写入，工具照常可用；最后一个只挡插件自己发起的 GitHub 查询。
+4. **ID 登记** — 见下节；顶部显示内置 ID 表的条数与玩家自填条数，没有联网按钮。
+5. **自动维护** — 三个开关，默认全开：`自动记忆`（AI 收尾时自己记纠错）、
+   `自动模板`（AI 自己把验证过的脚本存成模板）、`自动检查更新`。
+   前两个关掉只是让 agent 不再主动写入，工具照常可用；最后一个只挡插件自己发起的 GitHub 查询。
    开关存在 `config.json`。
 
 数据都在 `~/.dsh-minicode`（可用 `DSH_MINICODE_DATA_DIR` 改到别处，拒绝写到文件系统根目录；
@@ -119,12 +122,12 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 
 | 文件 | 内容 |
 | --- | --- |
-| `memory.json` | AI 记下的记忆 + 查不到的问题（上限 400 / 80；内置 12 条不写盘） |
-| `templates.json` | AI 存下的模板（内置 7 个不写盘） |
-| `ids.json` | 已登记 id（来源 `player` / `official` / `harvest`）+ 待填写请求 |
-| `config.json` | 四个开关（`autoMemory` / `autoTemplates` / `autoIds` / `autoUpdate`） |
+| `memory.json` | AI 记下的记忆 + 查不到的问题（上限 400 / 80；内置 22 条不写盘） |
+| `templates.json` | AI 存下的模板（内置 10 个不写盘） |
+| `ids.json` | 玩家自填的 id（来源 `player`）+ 待填写请求 |
+| `config.json` | 三个开关（`autoMemory` / `autoTemplates` / `autoUpdate`） |
 | `update.json` | 最近一次 GitHub 更新检查的缓存（版本、star、issue、最新提交，6 小时有效） |
-| `index.json` | 设置页抓取产生的索引；存在时优先于插件内置的 `data/ugc-wiki.json` |
+| `index.json` | 自己放的索引（可选）；存在时优先于插件内置的 `data/ugc-wiki.json` |
 
 ## 内置记忆与模板
 
@@ -132,7 +135,7 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 在 `ugc_memory` / `ugc_template` 里标 `[内置]`。**一个条目一个文件**：`builtin/memory/<id>.json`、`builtin/templates/<id>.lua`，
 加一条就是加一个文件、提一个 PR —— 格式和自查命令见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-**12 条记忆**（前三条置顶，直接进 `ugc_guide`）：
+**22 条记忆**（其中 5 条置顶，直接进 `ugc_guide`）：
 
 | 记忆 | 坑 |
 | --- | --- |
@@ -148,8 +151,18 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 | 变量 id | 界面型变量 id 只能玩家给，不许编 |
 | 玩家状态 | 用全局变量存每玩家状态，UI 隐藏时不清理 |
 | 代码风格 | 满屏防御性判断、一次性常量写成顶层 local、函数切得过碎 |
+| 脚本形态 | 写成 `return M` 模块再 dofile / require 组装；引擎里一个文件就是一个行为脚本，没有模块系统 |
+| 冒号调用 | `Actor.GetPosition(objid)` 点调用：objid 被当 self，返回 nil,nil,nil 且不报错 |
+| 射线取点 | `GetRayOriginPos` 返回三个数（不是 table），`GetAimDir` 才是 table |
+| 枚举真名 | `ItemId` 实际叫 `GridAttr`、`ActorType` 叫 `ObjType`；枚举是全局表，可 pairs |
+| 富文本标记 | 描述里的 `@item_102#`、`#c0aba1d`、`#r` 要洗掉，正文不会出现 # |
+| 天气枚举 | 用 0 起的 `GroupWeatherType`（12 值），别用带历史别名的 `WeatherType` |
+| 地形枚举 | `TerrainType` 是 Flat=0 / Normal=1；`BiomeType` 有 106 项、同样 0 起 |
+| 无配方 | `GetCraftMaterialAndNum` 返回 nil 属正常（自然方块），不要编材料 |
+| 聊天事件参数 | `PlayerNewInputContent` 的参数可能是字符串，也可能是 table，两种都要兼容 |
+| 定时任务 | `DoPeriodicTask` 要显式传 self，否则回调里拿不到脚本对象、Cancel 不掉 |
 
-**7 个模板**（`ugc_template list` 看全部，`get` 取源码）：
+**10 个模板**（`ugc_template list` 看全部，`get` 取源码）：
 
 | id | 内容 |
 | --- | --- |
@@ -160,38 +173,43 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 | `hold-repeat` | 长按连续触发：按下开 `DoPeriodicTask`，松手 `:Cancel()`，到边界自动停 |
 | `cross-component` | `FindObject(...):GetComponent(...)` 调别人、`comp:CloseUI` 关别人界面 |
 | `player-config` | `Data:GetValue` / `SetValue` + json 存玩家配置，进图补默认字段 |
+| `chat-command` | 聊天指令：参数两种形态兼容 + 关键词分发（时间 / 位置 / 帮助）+ 双通道回话 |
+| `api-selftest` | API 自检：pcall 逐条试调用打 `[OK]/[NO]`、pairs 打枚举表 `[ENUM]`，说「自检」触发 |
+| `periodic-task` | 定时任务：`DoPeriodicTask` 显式传 self、句柄存起来、计到 10 次自动 Cancel |
 
-## ID：官方表 + 玩家补
+## ID：随包内置的全量表 + 玩家补
 
 **UGC wiki 本身没有 id 表**：全站 40 个页面里没有一列数字 id，正文里挖出的「XXID = 123」总共只有 3 条。
+所以 id 表是**随插件发布的数据**，运行时不联网、不去抓任何站点。
 
-但**旧官网有**：<https://developers.mini1.cn/wiki/iddatas.html>（迷你世界 ID 查询）挂了 8 张真表，
-在 `/wiki/data_files/` 下，格式是重复的「(ID, 名字)」列对（一行最多四组）：
+`data/official-ids.json`（655 KB）在打包时由 `scripts/import-sjy.mjs` 从社区整理的全量 id 表生成，
+**不做区间过滤**：预留段、占位行、颜色变体都原样保留，查得到总比查不到好。13 个源文件合并成 **14 个 kind / 26493 个名字**：
 
-| 表 | 类型 | 条数 |
+| kind | 名字数 | 说明 |
 | --- | --- | --- |
-| `blockdef.html` | 方块 | 1142 |
-| `itemdef.html` | 道具 | 1764 |
-| `monster.html` | 生物 | 186 |
-| `particles.html` | 特效 | 314 |
-| `Sound.html` | 音效 | 494 |
-| `buffdef.html` | 状态 | 117 |
-| `triggeract.html` | 动作 | 20 |
-| `DevUIResource.html` | 图片库 | 527 |
+| item | 17838 | 道具（含方块类道具） |
+| effect | 2533 | 特效 |
+| block | 950 | 方块（沿用官方方块表） |
+| model | 912 | 模型 |
+| creature | 909 | 生物 |
+| skin | 601 | 皮肤 |
+| buff | 544 | 状态 |
+| picture | 526 | 图片库 |
+| sound | 494 | 音效 |
+| particle | 314 | 粒子 |
+| spell | 300 | 法术（强化 236 + 生成 64） |
+| skill | 273 | 坐骑技能 |
+| act | 241 | 动作 |
+| enchant | 58 | 附魔 |
 
-去重后 **4151 条**进 ID 登记表，来源标 `official`。这 8 张表还被打包成快照
-`data/official-ids.json`（52 KB），插件第一次启动时如果登记表里没有官方条目，
-就自动灌进去（实测 28 ms、零网络请求）——所以装好重启后 `ugc_ids lookup` 立刻能用。
+插件首次启动时把整张表灌进 ID 登记表（实测毫秒级、零网络请求）——所以装好重启后 `ugc_ids lookup` 立刻能用。
 
-1. `ugc_ids lookup` 先命中官方表（也可按数字反查名字，如 `lookup 1001`）；
-2. 官方表里没有的（**变量ID、元件ID** 只存在于玩家自己的地图）才会问玩家：
+1. `ugc_ids lookup` 先命中内置表（也可按数字反查名字，如 `lookup 1001`）；
+2. 内置表里没有的（**变量ID、元件ID** 只存在于玩家自己的地图）才会问玩家：
    工具提示「不要编造 id」，并把需求写进 `ids.json` 的等待列表；
-3. 玩家在 设置 → MiniCode → **ID 登记** 填写；`source=player` 的值**永远优先**于官方表，
-   重新同步官方表不会覆盖它；
-4. 同步时机：设置页`同步官方 ID 表`按钮随时可点；勾了`爬取后同步官方 ID 表`时，
-   每次手动抓取 wiki 成功后还会顺带刷新这 8 张表。
-
-设置页的`从 wiki 提取内置 id`按钮仍在：它把 wiki 语料里的 id 数字扫一遍，来源标 `harvest`。
+3. 玩家在 设置 → MiniCode → **ID 登记** 填写；`source=player` 的值**永远优先**于内置表，
+   换新版本插件也不会覆盖它；
+4. 想更新整张表：重新跑 `node scripts/import-sjy.mjs` 再发版，插件端不提供联网同步入口。
 
 ## 数据
 
@@ -201,19 +219,20 @@ dsh plugin --profile desktop add link:C:/path/to/dsh-minicode
 - 571 个 API 函数（1768 个参数）、242 个事件、96 组枚举（876 个取值）、15 篇散文页
 - 记录形状（API）：`{kind,id,module,moduleCn,receiver,name,anchor,page,desc,sig,params[{name,type,desc}],returns,note,example}`
 - 增量同步键：每页页脚的 `Last updated: <time datetime>` → `meta.wikiUpdated`
-- `data/official-ids.json`：旧官网 8 张 id 表的快照（4151 条，52 KB），首次启动时灌进 ID 登记表
+- `data/official-ids.json`：全量 id 表快照（14 个 kind、26493 条、655 KB），首次启动时灌进 ID 登记表
 
-### 刷新索引
+### 刷新索引（维护者操作）
 
-设置页点一下即可（结果写 `~/.dsh-minicode/index.json`）；也可以命令行重建随包数据：
+索引随包发布，**插件运行时不会去抓 wiki**。要重建随包数据，由维护者在本机跑：
 
 ```bash
-node scripts/build.mjs              # 在线抓取 wiki 并重建 data/ugc-wiki.json
+node scripts/build.mjs              # 抓一次 wiki 并重建 data/ugc-wiki.json
 node scripts/build.mjs --offline    # 用 _probe/pages 里的缓存页面重建（离线、秒级）
+node scripts/import-sjy.mjs         # 重建 data/official-ids.json（全量 id 表）
 ```
 
-爬虫只请求约 40 个静态 HTML 页面（VitePress 全静态渲染，无需无头浏览器）：
-页面清单取自首页侧边栏，4 并发、3 次重试，解析失败只影响单页。
+构建脚本只请求约 40 个静态 HTML 页面（VitePress 全静态渲染，无需无头浏览器）：
+页面清单取自首页侧边栏，4 并发、3 次重试，解析失败只影响单页。产物随包发布，终端用户看不到这些请求。
 
 ## 结构
 
@@ -226,24 +245,25 @@ lib/memory.mjs       易错点记忆 + 查不到的问题（内置记忆从 buil
 lib/templates.mjs    模板库（内置模板从 builtin/ 读 + AI 自存的）
 lib/builtin.mjs      内置记忆 / 模板的加载器（一个文件一条，启动时读一次）
 lib/ids.mjs          ID 登记表 + 待填写请求 + 官方表批量导入
-lib/idsource.mjs     旧官网 8 张 id 表的下载与解析（developers.mini1.cn）
+lib/idsource.mjs     内置 id 表的加载与灌库（不联网）
 lib/config.mjs       自动维护开关（config.json）
 lib/update.mjs       GitHub 仓库查询：版本比较、star / issue、检查更新缓存
-lib/harvest.mjs      从语料里挖 id 数字（并统计各种 ID 的提及次数）
-lib/crawl.mjs        抓取 40 页并组装索引（在线 / 离线）
-lib/api.mjs          /dsh-minicode/api 路由与后台抓取任务
+lib/harvest.mjs      从语料里挖 id 数字（构建期工具，运行时不调用）
+lib/crawl.mjs        抓取 40 页并组装索引（构建期工具，插件运行时不调用）
+lib/api.mjs          /dsh-minicode/api 路由（只读本地数据，无抓取任务）
 lib/web.mjs          JSON 收发小工具
 lib/paths.mjs        数据目录（~/.dsh-minicode，含旧目录迁移）
 lib/jsonfile.mjs     原子读写 JSON
 lib/html.mjs         无依赖 HTML 树构建器（解析期用）
-scripts/build.mjs    命令行爬虫（调用 lib/crawl.mjs）
+scripts/build.mjs    命令行爬虫（调用 lib/crawl.mjs，维护者用）
+scripts/import-sjy.mjs     全量 id 表 → data/official-ids.json（维护者用）
 scripts/parse.mjs    单页解析（四种页面形状）
 scripts/check-contrib.mjs  校验 builtin/ 里的记忆和模板（PR 前跑，npm test 也跑）
-builtin/memory/*.json      12 条内置记忆，一个文件一条
-builtin/templates/*.lua    7 个内置模板，一个文件一个脚本
+builtin/memory/*.json      22 条内置记忆，一个文件一条
+builtin/templates/*.lua    10 个内置模板，一个文件一个脚本
 CONTRIBUTING.md      怎么加一条记忆 / 一个模板（一个文件一个 PR）
 data/ugc-wiki.json   构建产物
-data/official-ids.json  官方 id 表快照（首次启动灌进 ID 登记表）
+data/official-ids.json  全量 id 表快照（首次启动灌进 ID 登记表）
 ```
 
 ## 排查

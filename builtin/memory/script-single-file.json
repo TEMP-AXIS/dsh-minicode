@@ -1,0 +1,12 @@
+{
+  "topic": "行为脚本是单文件，不是模块",
+  "wrong": "写成 return M 的模块，再用 dofile / require 组装；游戏里没有 dofile、require 和模块系统，引擎直接把文件当成一个脚本对象，于是既不报错也不运行",
+  "right": "一个 Lua 文件就是一个行为脚本：local Script = {} → function Script:OnStart() self:AddTriggerEvent(TriggerEvent.GameStart, self.OnGameStart) end → return Script。所有逻辑写进同一个文件，多个脚本就交多个文件",
+  "tags": [
+    "脚本形态",
+    "入口",
+    "OnStart",
+    "return Script"
+  ],
+  "pinned": true
+}

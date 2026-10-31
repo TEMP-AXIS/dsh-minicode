@@ -1,0 +1,12 @@
+{
+  "topic": "方块没有合成配方是正常的",
+  "wrong": "GetCraftMaterialAndNum 返回 nil 就当成接口坏了、或者去编一份材料清单填给玩家",
+  "right": "很多方块本来就没有配方（自然生成、直接采集）。nil 时照实说「它没有合成配方，挖、采集或打怪直接获得」，不要编材料；有配方的道具再逐条列材料与数量",
+  "tags": [
+    "配方",
+    "GetCraftMaterialAndNum",
+    "nil",
+    "别编造"
+  ],
+  "pinned": false
+}

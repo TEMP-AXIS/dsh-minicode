@@ -1,0 +1,12 @@
+{
+  "topic": "定时任务要显式传 self",
+  "wrong": "DoPeriodicTask(self.OnTick, 1) 少传参数：回调里拿不到脚本对象，:Cancel() 也取消不掉，任务一直挂着",
+  "right": "DoPeriodicTask 需要显式传 self（有的版本还要传玩家 objid），回调里 self 才是脚本对象；句柄存起来，结束时 :Cancel()。单条 print 不会截断，可以放心一次打多行日志",
+  "tags": [
+    "DoPeriodicTask",
+    "定时",
+    "Cancel",
+    "print"
+  ],
+  "pinned": false
+}

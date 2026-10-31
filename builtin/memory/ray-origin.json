@@ -1,0 +1,12 @@
+{
+  "topic": "射线取点的返回形状",
+  "wrong": "把 Player:GetRayOriginPos 当 table 用（p.x、p.y），实际它返回三个数；于是 p.x = nil，整段射线逻辑被跳过，日志里只剩 origin=nil",
+  "right": "Player:GetRayOriginPos(objid) 返回 x, y, z 三个 number；Player:GetAimDir(objid) 才返回 table {x,y,z}（单位向量）；GetAimPos 同样返回三个数。取完把两者拼成一条射线，配合 RayDetect(RayDetectType.Block, ...) 拿目标",
+  "tags": [
+    "射线",
+    "GetRayOriginPos",
+    "GetAimDir",
+    "返回值"
+  ],
+  "pinned": false
+}

@@ -1,8 +1,8 @@
 // Settings page for dsh-minicode (browser half).
 //
-// Four tabs: the index (with a manual crawl button - crawling is never automatic),
-// the memory of mistakes, the template library, and the id registry the player
-// fills in when the wiki cannot supply a number.
+// Five tabs: the index (bundled with the plugin, never fetched at runtime),
+// the memory of mistakes, the template library, the id registry, and the
+// automation switches.
 window.__ModuleLoader__.load({
   id: 'dsh-minicode',
   factory(require) {
@@ -65,29 +65,10 @@ window.__ModuleLoader__.load({
 
     function IndexTab(props) {
       const [state, reload] = useLoad(() => request('/status'));
-      const [busy, setBusy] = useState('');
-      const [note, setNote] = useState('');
       const [error, setError] = useState('');
       const status = state.data;
-      const crawl = status ? status.crawl : null;
-      const running = crawl && crawl.state === 'running';
       const [updState, setUpdState] = useState(null);
       const [updBusy, setUpdBusy] = useState(false);
-
-      React.useEffect(() => {
-        if (!running) return undefined;
-        const timer = setInterval(() => { reload(); }, 1000);
-        return () => clearInterval(timer);
-      }, [running, reload]);
-
-      function start(mode) {
-        setBusy('crawl');
-        setError('');
-        request('/crawl', { method: 'POST', body: JSON.stringify({ mode: mode }) })
-          .then(() => { setNote('抓取已开始，进度会显示在这里'); reload(); })
-          .catch((err) => setError(String(err.message || err)))
-          .then(() => setBusy(''));
-      }
 
       function checkUpdate() {
         setUpdBusy(true);
@@ -98,20 +79,10 @@ window.__ModuleLoader__.load({
           .then(() => setUpdBusy(false));
       }
 
-      function harvest() {
-        setBusy('harvest');
-        setError('');
-        request('/harvest', { method: 'POST', body: '{}' })
-          .then((data) => setNote('从 wiki 正文提取到 ' + data.found + ' 条 id，新增 ' + data.merged.added + ' 条；已登记总数 ' + data.merged.total))
-          .catch((err) => setError(String(err.message || err)))
-          .then(() => setBusy(''));
-      }
-
       if (state.loading && !status) return h('div', { className: 'ugcMuted' }, '读取索引状态…');
       if (state.error) return h('div', { className: 'ugcErr' }, state.error);
 
       const counts = status.index.counts || {};
-      const percent = crawl && crawl.total ? Math.round((crawl.done / crawl.total) * 100) : 0;
       const upd = updState || status.update || {};
       const updLine = upd.error
         ? '更新检查失败：' + upd.error
@@ -123,7 +94,7 @@ window.__ModuleLoader__.load({
       return h('div', { className: 'ugcCard' },
         h('div', { className: 'ugcGrid' },
           h('span', { className: 'ugcMuted' }, '数据来源'),
-          h('span', null, status.index.source === 'crawled' ? '手动抓取（本地 index.json）' : '插件内置（data/ugc-wiki.json）'),
+          h('span', null, status.index.source === 'bundled' ? '插件内置（data/ugc-wiki.json）' : '本地 index.json（自行放置）'),
           h('span', { className: 'ugcMuted' }, '索引文件'),
           h('span', { className: 'ugcMuted', style: { wordBreak: 'break-all' } }, status.index.path),
           h('span', { className: 'ugcMuted' }, '构建时间'),
@@ -143,22 +114,9 @@ window.__ModuleLoader__.load({
           h('span', { className: 'ugcMuted', style: { wordBreak: 'break-all' } }, status.dataDir),
         ),
         h('div', { className: 'ugcRow' },
-          h(Btn, { primary: true, disabled: running || busy !== '', onClick: () => start('live') }, running ? '抓取中…' : '立即抓取 wiki'),
-          h(Btn, { disabled: running, onClick: () => request('/crawl/cancel', { method: 'POST', body: '{}' }).then(reload) }, '取消'),
-          h(Btn, { disabled: busy !== '', onClick: harvest }, busy === 'harvest' ? '提取中…' : '从 wiki 提取内置 id'),
           h(Btn, { onClick: reload }, '刷新')
         ),
-        crawl && (running || crawl.state === 'error' || crawl.state === 'done')
-          ? h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } },
-              h('div', { className: 'ugcProgress' }, h('div', { className: 'ugcBar', style: { width: (running ? percent : 100) + '%' } })),
-              h('div', { className: running ? 'ugcMuted' : (crawl.state === 'error' ? 'ugcErr' : 'ugcMuted') },
-                '状态: ' + crawl.state + ' · ' + (crawl.message || '') + (crawl.total ? ' · ' + crawl.done + '/' + crawl.total : '')),
-              crawl.failures && crawl.failures.length
-                ? h('div', { className: 'ugcErr' }, '失败页面: ' + crawl.failures.map((f) => f.path).join(' '))
-                : null
-            )
-          : null,
-        h('div', { className: 'ugcMuted' }, '抓取只在点击按钮时执行；结果写入数据目录的 index.json，并立刻替换当前索引。'),
+        h('div', { className: 'ugcMuted' }, '索引与 ID 表都随插件发布，运行时不联网、不抓取任何站点。要换索引，把 index.json 放进上面的数据目录，重启后生效。'),
         h('div', { style: { borderTop: '1px solid var(--dsw-alias-border-l1)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 } },
           h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
             h('strong', null, 'dsh-minicode v' + (upd.local || '0.0.0') + (upd.latest && upd.newer ? ' → v' + upd.latest : '')),
@@ -176,10 +134,10 @@ window.__ModuleLoader__.load({
             (upd.sha ? ' · 最新提交 ' + upd.sha : '')
           )
         ),
-        h(Notice, { text: note }),
         h(Notice, { text: error, error: true })
       );
     }
+
     function MemoryTab() {
       const [state, reload] = useLoad(() => request('/memory'));
       const [note, setNote] = useState('');
@@ -298,21 +256,15 @@ window.__ModuleLoader__.load({
     }
 
     function IdsTab() {
-      const [state, reload] = useLoad(() => request('/ids'));
+      // 内置表有两万多个名字，列表只列玩家自己填的；内置表的体量看上面的条数
+      const [state, reload] = useLoad(() => request('/ids?source=player'));
       const [form, setForm] = useState({ kind: 'item', name: '', value: '', note: '' });
       const [filter, setFilter] = useState('');
       const [pendingValues, setPendingValues] = useState({});
       const [error, setError] = useState('');
       const data = state.data || { items: [], pending: [], kinds: [] };
       const kinds = data.kinds || [];
-      const sync = data.sync || { state: 'idle', done: 0, total: 0, message: '' };
       const bySource = (data.stats && data.stats.bySource) || {};
-      // Poll while the eight official tables are downloading.
-      React.useEffect(() => {
-        if (sync.state !== 'running') return undefined;
-        const timer = setInterval(() => { reload(); }, 1200);
-        return () => clearInterval(timer);
-      }, [sync.state]);
       const items = (data.items || []).filter((item) => {
         if (!filter) return true;
         const needle = filter.toLowerCase();
@@ -340,12 +292,6 @@ window.__ModuleLoader__.load({
         request('/ids', { method: 'POST', body: JSON.stringify(payload) }).then(reload).catch((err) => setError(String(err.message || err)));
       }
 
-      function startSync() {
-        request('/ids', { method: 'POST', body: JSON.stringify({ action: 'sync-official' }) })
-          .then(() => reload())
-          .catch((err) => setError(String(err.message || err)));
-      }
-
       const kindLabel = (kind) => {
         const hit = kinds.filter((entry) => entry.kind === kind)[0];
         return hit ? hit.label : kind;
@@ -353,25 +299,16 @@ window.__ModuleLoader__.load({
 
       return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12 } },
         h('div', { className: 'ugcMuted' },
-          'wiki 只写了函数要什么 id，从不公布具体数字；官方 ID 表由旧官网发布，可以一键同步。变量ID、元件ID 只存在于你自己的地图里，只能由你填写。'
+          'wiki 只写了函数要什么 id，从不公布具体数字；下面的 ID 表随插件一起发布，包含道具/方块/生物/特效/状态/皮肤/模型/动作等 14 类。变量ID、元件ID 只存在于你自己的地图里，只能由你填写。'
         ),
         h('div', { className: 'ugcCard' },
           h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
-            h('strong', null, '官方 ID 表（方块 / 道具 / 生物 / 特效 / 音效 / 状态 / 动作 / 图片）'),
-            h('span', { className: 'ugcRow' },
-              sync.state === 'running'
-                ? h('span', { className: 'ugcMuted' }, (sync.message || '同步中') + ' ' + sync.done + '/' + sync.total)
-                : null,
-              h(Btn, { primary: true, disabled: sync.state === 'running', onClick: startSync }, sync.state === 'running' ? '同步中…' : '同步官方 ID 表')
-            )
+            h('strong', null, '内置 ID 表（道具 / 方块 / 生物 / 特效 / 状态 / 皮肤 / 模型 / 动作 …）')
           ),
           h('div', { className: 'ugcMuted' },
-            '旧官网 developers.mini1.cn/wiki/iddatas.html 公开发布了这 8 张表，同步后来源标为「官方ID表」，玩家手填的值永远优先。当前：官方 '
+            '表随插件发布，运行时不联网拉取；玩家手填的值永远优先，下面只列你填的。当前：内置 '
               + (bySource.official || 0) + ' 条，玩家 ' + (bySource.player || 0) + ' 条，共 ' + ((data.stats && data.stats.total) || 0) + ' 条。'
-          ),
-          sync.state === 'done' || sync.state === 'error'
-            ? h('div', { className: sync.state === 'error' ? 'ugcErr ugcMuted' : 'ugcMuted' }, (sync.message || '') + (sync.finishedAt ? '  ·  ' + sync.finishedAt : ''))
-            : null
+          )
         ),
         h('div', { className: 'ugcCard' },
           h('div', { className: 'ugcRow' },
@@ -421,8 +358,10 @@ window.__ModuleLoader__.load({
                   h('div', { className: 'ugcRow', style: { justifyContent: 'space-between' } },
                     h('span', null, kindLabel(item.kind) + ' · ' + item.name + ' = ' + item.value),
                     h('span', { className: 'ugcRow' },
-                      h('span', { className: 'ugcTag' }, item.source === 'player' ? '玩家填写' : item.source === 'official' ? '官方ID表' : 'wiki 提取'),
-                      h(Btn, { onClick: () => act({ action: 'delete', key: item.key }) }, '删除')
+                      h('span', { className: 'ugcTag' }, item.source === 'player' ? '玩家填写' : '内置ID表'),
+                      item.source === 'player'
+                        ? h(Btn, { onClick: () => act({ action: 'delete', key: item.key }) }, '删除')
+                        : null
                     )
                   ),
                   item.note ? h('div', { className: 'ugcMuted' }, item.note) : null
@@ -435,7 +374,7 @@ window.__ModuleLoader__.load({
     function AutoTab() {
       const [state, reload] = useLoad(() => request('/settings'));
       const [error, setError] = useState('');
-      const cfg = (state.data && state.data.config) || { autoMemory: true, autoTemplates: true, autoIds: true, autoUpdate: true };
+      const cfg = (state.data && state.data.config) || { autoMemory: true, autoTemplates: true, autoUpdate: true };
       function toggle(key) {
         const payload = {};
         payload[key] = !cfg[key];
@@ -446,11 +385,10 @@ window.__ModuleLoader__.load({
       const rows = [
         ['autoMemory', '自动记忆', 'AI 收尾时把「以为是这样、实际是那样」的修正自己记下来，之后 ugc_search / ugc_pack 会自动附上。'],
         ['autoTemplates', '自动模板', 'AI 写出并验证过的脚本自己存成模板，下次同类任务先取现成骨架。'],
-        ['autoIds', '爬取后同步官方 ID 表', '每次手动爬取成功后，顺带刷新 developers.mini1.cn 的 8 张 id 表。'],
         ['autoUpdate', '自动检查更新', '启动时读一次 GitHub 仓库（缓存 6 小时），有更新就在 ugc_status 和设置页提示。'],
       ];
       return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12 } },
-        h('div', { className: 'ugcMuted' }, '前三项由 AI 自己维护，不需要你逐条操作；关掉以后 AI 不再主动写入，工具本身照常可用。最后一项只影响插件自己发起的 GitHub 查询。'),
+        h('div', { className: 'ugcMuted' }, '前两项由 AI 自己维护，不需要你逐条操作；关掉以后 AI 不再主动写入，工具本身照常可用。最后一项只影响插件自己发起的 GitHub 查询。'),
         h('div', { className: 'ugcCard' }, rows.map((row) =>
           h('div', { key: row[0], className: 'ugcRow', style: { justifyContent: 'space-between', alignItems: 'flex-start' } },
             h('div', { style: { flex: '1 1 320px' } },
