@@ -1,5 +1,8 @@
 node_modules/
 
+# 发布制品（pnpm pack / zip 产物），需要时用 pnpm pack 重新生成
+dist/
+
 # Scratch space: extracted copies of the DSH application bundle (third-party
 # code, 5 MB) and throwaway network test data.
 _probe/asar_out/

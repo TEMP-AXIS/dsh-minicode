@@ -60,6 +60,24 @@ dsh plugin --profile desktop add https://github.com/TEMP-AXIS/dsh-minicode/archi
 pnpm 能直接把 GitHub 的仓库压缩包当依赖装（本机实测了这个形式，无需 git、无构建脚本）。
 缺点是压缩包会把 `_probe/` 一起带上（约 1 MB）；想干净就先 `git clone` 再 `link:`。
 
+### 用发布的资源包安装（离线、无需 git）
+
+`dist/` 里有两个等价制品，选一个：
+
+| 文件 | 用途 |
+|---|---|
+| `dsh-minicode-0.5.0.tgz` | pnpm 能直接当依赖装（推荐） |
+| `dsh-minicode-0.5.0.zip` | 解压即用的源码目录，看代码或 `link:` 都行 |
+
+```bash
+dsh plugin --profile desktop add file:C:/path/to/dsh-minicode-0.5.0.tgz
+# 或者解压 zip 后
+dsh plugin --profile desktop add link:C:/path/to/dsh-minicode-0.5.0
+```
+
+包内含 index.js / client.js / lib/ / builtin/ / data/（索引 + 全量 ID 表）/ scripts/ / README /
+CHANGELOG / cordis.patch.yml / icon.svg，共 64 个文件、约 440 KB，不含 `_probe/` 与调试脚本。
+
 ### 从本地副本安装（改代码时用这个）
 
 ```bash
